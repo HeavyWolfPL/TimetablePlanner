@@ -1,0 +1,94 @@
+<TimetablePlanner>
+  <LessonHours>
+    <LessonHour number="1">
+      <Hours>
+        <Start value="7:10"/>
+        <End value="7:55"/>
+      </Hours>
+      <RestrictedLessons>
+        <RestrictedLesson name="W-F" />
+      </RestrictedLessons>
+      <SpecialFlag early="true" late="false"/>
+	  </LessonHour>
+    <LessonHour number="2">
+      <Hours>
+        <Start value="8:00"/>
+        <End value="8:45"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="3">
+      <Hours>
+        <Start value="8:50"/>
+        <End value="9:35"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="4">
+      <Hours>
+        <Start value="9:45"/>
+        <End value="10:30"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="5">
+      <Hours>
+        <Start value="10:45"/>
+        <End value="11:30"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="6">
+      <Hours>
+        <Start value="11:35"/>
+        <End value="12:20"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="7">
+      <Hours>
+        <Start value="12:25"/>
+        <End value="13:10"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="8">
+      <Hours>
+        <Start value="13:20"/>
+        <End value="14:05"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="9">
+      <Hours>
+        <Start value="14:10"/>
+        <End value="14:55"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="10">
+      <Hours>
+        <Start value="15:00"/>
+        <End value="15:45"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+    <LessonHour number="11">
+      <Hours>
+        <Start value="15:50"/>
+        <End value="16:35"/>
+      </Hours>
+      <RestrictedLessons />
+      <SpecialFlag early="false" late="false"/>
+    </LessonHour>
+  </LessonHours>
+</TimetablePlanner>

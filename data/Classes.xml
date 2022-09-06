@@ -1,0 +1,17 @@
+<TimetablePlanner>
+  <Classes>
+    <Class name="1A" students="30">
+        <Students value="30"/>
+        <Teachers>
+            <Teacher name="Mr. Smith" subject="Wychowawca" group="N/A"/>
+            <Teacher name="Mr. Jahoo" subject="Biologia" group="N/A"/>
+            <Teacher name="Mrs. Jones" subject="Math" group="N/A"/>
+            <Teacher name="Mr. Cluetch" subject="W-F" group="A"/>
+        </Teachers>
+        <HourFlags>
+            <EarlyHours value="false" />
+            <LateHours value="false" />
+        </HourFlags>
+        <ClassRoom name="None" />
+  </Classes>
+</TimetablePlanner>

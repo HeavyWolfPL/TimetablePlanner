@@ -1,0 +1,10 @@
+{
+    "name": "John Doe",
+    "subjects": [
+        {
+            "name": "Math",
+            "groups": false,
+            "classroom_type": "normal"
+        }
+    ]
+}

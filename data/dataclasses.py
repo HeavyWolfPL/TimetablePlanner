@@ -4,10 +4,15 @@ from typing import List, Union
 # LessonHour, Classroom, Subject, Teacher, Class, Lesson, Timetable
 
 @dataclass
+class Flags:
+    early: bool = False
+    late: bool = False
+
+@dataclass
 class LessonHour:
     start: str
     end: str
-    hour_flags: List[str]
+    hour_flags: List[Flags]
 
 @dataclass
 class Classroom:
@@ -32,7 +37,7 @@ class Class:
     students: int
     subjects: List[Subject]
     teachers: List[Union[Subject, str]]
-    hour_flags: List[str]
+    hour_flags: List[Flags]
     classroom: str
 
 @dataclass

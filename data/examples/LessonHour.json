@@ -1,0 +1,10 @@
+{
+    "start": "8:00",
+    "end": "8:45",
+    "hour_flags": [
+        {
+            "early": true,
+            "late": false
+        }
+    ]
+}

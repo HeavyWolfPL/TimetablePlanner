@@ -1,0 +1,100 @@
+{
+    "class_": {
+        "name": "1TI1",
+        "students": 30,
+        "subjects": [
+            {
+                "name": "Math",
+                "groups": false,
+                "classroom_type": "normal"
+            }
+        ],
+        "teachers": [
+            {
+                "name": "John Doe",
+                "subjects": [
+                    {
+                        "name": "Math",
+                        "groups": false,
+                        "classroom_type": "normal"
+                    }
+                ]
+            }
+        ],
+        "hour_flags": [
+            {
+                "early": true,
+                "late": false
+            }
+        ],
+        "classroom": "1"
+    },
+    "monday": [
+        {
+            "hour": {
+                "start": "8:00",
+                "end": "8:45",
+                "hour_flags": [
+                    {
+                        "early": true,
+                        "late": false
+                    }
+                ]
+            },
+            "classroom": {
+                "name": "1",
+                "type": "normal",
+                "max_students": 30
+            },
+            "subject": {
+                "name": "Math",
+                "groups": false,
+                "classroom_type": "normal"
+            },
+            "teacher": {
+                "name": "John Doe",
+                "subjects": [
+                    {
+                        "name": "Math",
+                        "groups": false,
+                        "classroom_type": "normal"
+                    }
+                ]
+            },
+            "class_": {
+                "name": "1TI1",
+                "students": 30,
+                "subjects": [
+                    {
+                        "name": "Math",
+                        "groups": false,
+                        "classroom_type": "normal"
+                    }
+                ],
+                "teachers": [
+                    {
+                        "name": "John Doe",
+                        "subjects": [
+                            {
+                                "name": "Math",
+                                "groups": false,
+                                "classroom_type": "normal"
+                            }
+                        ]
+                    }
+                ],
+                "hour_flags": [
+                    {
+                        "early": true,
+                        "late": false
+                    }
+                ],
+                "classroom": "1"
+            }
+        }
+    ],
+    "tuesday": [],
+    "wednesday": [],
+    "thursday": [],
+    "friday": []
+}

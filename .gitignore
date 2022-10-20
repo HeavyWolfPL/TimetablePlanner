@@ -4,7 +4,7 @@
 */dist/*
 /.venv/
 /.vs/
-*/*config.json
+/*config.json
 
 # Diagram
 *.bkp

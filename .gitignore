@@ -5,6 +5,7 @@
 /.venv/
 /.vs/
 /*config.json
+/logs/
 
 # Diagram
 *.bkp

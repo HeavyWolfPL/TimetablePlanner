@@ -2,7 +2,6 @@ from dataclasses import dataclass
 from typing import List, Union
 
 # LessonHour, Classroom, Subject, Teacher, Class, Lesson, Timetable
-
 @dataclass
 class Flags:
     early: bool = False
@@ -23,13 +22,15 @@ class Classroom:
 @dataclass
 class Subject:
     name: str
-    groups: bool
-    classroom_type: str
+    first_class_hr: int
+    second_class_hr: int
+    third_class_hr: int
 
 @dataclass
 class Teacher:
     name: str
-    subjects: List[Subject]
+    short_name: str
+    subjects: str
 
 @dataclass
 class Class:

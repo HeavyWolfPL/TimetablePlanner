@@ -76,7 +76,8 @@ class DatabaseTools():
         query = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy")
         #TODO: Walidacja bazy danych
 
-
+    # MariaDB Error Codes
+    # https://mariadb.com/kb/en/mariadb-error-codes/
 
     def databaseQuery(self, query, on_fail = None):
         """
@@ -88,7 +89,7 @@ class DatabaseTools():
             on_fail - klasa funkcji, która ma być wywołana w przypadku błędu.
 
         Zwraca:
-            return - wartość zwróconą przez zapytanie SQL
+            result - wartość zwróconą przez zapytanie SQL
         """
         database = DatabaseTools.databaseGet(self)
         cursor = database.cursor()
@@ -100,8 +101,9 @@ class DatabaseTools():
             # TODO: Wypełnić błędy
             if debug:
                 print("Error Code:", err.errno)
-                print("SQLSTATE", err.sqlstate)
-                print("Message", err.msg)
+                print("SQLSTATE:", err.sqlstate)
+                print("Message:", err.msg)
+                print("Query:", query)
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Błędne hasło lub login.")
                 LoggingTools.log(self, "Błędne hasło lub login.", "crash", _getframe().f_lineno)
@@ -111,7 +113,7 @@ class DatabaseTools():
                 input("Naciśnij Enter, aby wrócić do menu głównego.")
             else:
                 print("Wystąpił nieznany błąd. Odpowiednia treść została zapisana w logu.")
-                LoggingTools.log(self, f"Wystąpił nieznany błąd: \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
+                LoggingTools.log(self, f"Wystąpił nieznany błąd: \nSQL - {query} \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
                 input("Naciśnij Enter, aby wrócić do menu głównego.")
             
             if on_fail != None:
@@ -119,10 +121,66 @@ class DatabaseTools():
                 
 
         if result == []:
-            print("Wynik jest pusty. Sprawdź poprawność zapytania.")
+            # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
+            # TODO: Chyba zły pomysł
             result = False
 
+        LoggingTools.log(self, f'Zapytanie SQL: "{query}" \nZwrócono: "{result}"', "debug")
         return result
+
+    def databaseModify(self, command, on_fail = None):
+        """
+        Wykonuje polecenie SQL, tzw. komenda.
+
+        Parametry:
+            self - referencja do obiektu
+            command - polecenie SQL
+            on_fail - klasa funkcji, która ma być wywołana w przypadku błędu.
+
+        Zwraca:
+            int - wartość dodanych/zmienionych wierszy
+        """
+        database = DatabaseTools.databaseGet(self)
+        cursor = database.cursor()
+
+        try:
+            cursor.execute(command)
+            database.commit()
+        except mysql.connector.Error as err:
+            # TODO: Wypełnić błędy
+            if debug:
+                print("Error Code:", err.errno)
+                print("SQLSTATE", err.sqlstate)
+                print("Message", err.msg)
+                print("Query:", command)
+            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                print("Błędne hasło lub login.")
+                LoggingTools.log(self, "Błędne hasło lub login.", "crash", _getframe().f_lineno)
+            elif err.errno == errorcode.ER_BAD_FIELD_ERROR: # Error code - 1054 aka Unknown column '%s' in '%s'
+                print("Nie znaleziono wyników zgodnych z podanym filtrem.")
+                LoggingTools.log(self, f"Nie znaleziono klasy zgodnej z podanym filtrem.", "debug")
+                input("Naciśnij Enter, aby wrócić do menu głównego.")
+            elif err.errno == errorcode.ER_DUP_ENTRY: # Error code - 1062 aka Duplicate entry
+                print("Wprowadzona wartość już istnieje w bazie danych.")
+                LoggingTools.log(self, f'Wprowadzona wartość już istnieje w bazie danych. \nZapytanie SQL: "{command}"', "debug")
+                input("Naciśnij Enter, aby wrócić do menu głównego.")
+            else:
+                print("Wystąpił nieznany błąd. Odpowiednia treść została zapisana w logu.")
+                LoggingTools.log(self, f"Wystąpił nieznany błąd: \nSQL - {command} \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
+                input("Naciśnij Enter, aby wrócić do menu głównego.")
+            
+            if on_fail != None:
+                on_fail.main(self)
+
+        result = cursor.rowcount
+        if result == []:
+            # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
+            # TODO: Chyba zły pomysł
+            result = False
+
+        LoggingTools.log(self, f'Zapytanie SQL: "{command}" \nZmodyfikowane wiersze: "{result}"', "debug")
+        return result
+
 
     def databaseClose(self, database):
         database.close()
@@ -160,7 +218,7 @@ class LoggingTools():
 
         Parametry:
             self - referencja do obiektu\n
-            messege - treść wiadomości\n
+            message - treść wiadomości\n
             log_type - typ wiadomości (debug, info, error, crash/critical)\n
                 crash/critical - wywołuje zamknięcie programu.\n
             line - linia, z której została wywołana funkcja   
@@ -193,6 +251,48 @@ class LoggingTools():
                 crash_log.write(f"{message} {line}")
             timetable_logs.critical(f"{message} {line}")
             exit()
+
+    def cleanup():
+        """
+        Czyści określoną ilość plików zawierających logi, w zależności od trybu.\n
+        Funkcja nie usuwa tzw. crash logów.
+
+        Parametry:
+            self - referencja do obiektu\n
+            mode - tryb czyszczenia logów\n
+                days - usuwa logi starsze niż podana ilość dni\n
+                number - pozostawia najnowszą ilość logów, a resztę usuwa\n
+            amount - ilość logów
+        """
+        with open("config.json", "r") as config: 
+            data = json.load(config)
+            mode = data["log_cleanup_mode"]
+            amount = data["log_cleanup_amount"]
+        self = None
+
+        to_be_removed = []
+
+        if mode == "days":
+            now = datetime.now()
+            for log in os.listdir("./logs"):
+                if log.endswith(".log") and not log.startswith("[Crash]"):
+                    log_date = datetime.strptime(log[7:26], '%d-%m-%Y %H-%M-%S') # [7:26] - date inside file name
+                    if (now - log_date).days > amount:
+                        to_be_removed.append(log)
+
+        elif mode == "number":
+            for log in os.listdir("./logs"):
+                if log.endswith(".log") and not log.startswith("[Crash]"):
+                    to_be_removed.append(log)
+            to_be_removed.sort(reverse=True)
+            to_be_removed = to_be_removed[amount:]
+
+
+        LoggingTools.log(self, f"Rozpoczynanie usuwania logów. Do usunięcia - {len(to_be_removed)}. Tryb - {mode}, ilość - {amount}", "debug")
+        for log in to_be_removed:
+            os.remove(f"./logs/{log}")
+            LoggingTools.log(self, f"Usunięto log: {log}", "debug")
+
 
 
         

@@ -22,6 +22,7 @@ class Classroom:
 @dataclass
 class Subject:
     name: str
+    teacher_preference: int # 0 - any subject teacher, 1 - headteacher
     first_class_hr: int
     second_class_hr: int
     third_class_hr: int
@@ -31,15 +32,18 @@ class Teacher:
     name: str
     short_name: str
     subjects: str
+    headteacher: int # 0 - nope, 1 - can be / is
+    hours: int
 
 @dataclass
 class Class:
     name: str
     students: int
-    subjects: List[Subject]
-    teachers: List[Union[Subject, str]]
-    hour_flags: List[Flags]
-    classroom: str
+    headteacher: str
+    # subjects: List[Subject]
+    # teachers: List[Union[Subject, str]]
+    # hour_flags: List[Flags]
+    # classroom: str
 
 @dataclass
 class Lesson:

@@ -39,16 +39,19 @@ Placeholder
 >   - [x] Klasy
 >   - [x] Sale
 >   - [ ] Plan lekcji
-> - [ ] Wprowadzenie zabezpieczeń przed idiotyczną zmianą danych
-> - [ ] MS Access -> SQL -> phpMyAdmin
-> - [ ] Dostęp z serwera
-> - [ ] Wprowadzenie samych danych
+> - [ ] Wprowadzenie zabezpieczeń przed idiotyczną zmianą danych / Walidacja danych
+> - [x] MS Access -> SQL -> phpMyAdmin
+> - [x] Dostęp z serwera
+> - [x] Wprowadzenie samych danych
 
 #### 2. Generator
 > - [ ] Generowanie planu na gotowych danych
 > - [ ] Przydzielanie sali do klasy na bazie wolnych sal i liczby osób
-> - [ ] Przydzielenie nauczyciela do klasy na bazie etatu
-> - [ ] Połączenie z bazą danych
+> - [x] Przydzielenie nauczyciela do klasy na bazie etatu
+> - [x] Przedmioty wychowawcy
+>   - 0 = Dowolny nauczyciel przedmiotu
+>   - 1 = Wychowawca
+> - [x] Połączenie z bazą danych
 > - [ ] Zapis danych tymczasowo jako XML/JSON
 > - [ ] Komunikacja przez PyScript
 
@@ -69,6 +72,7 @@ Placeholder
 <details>
 <summary>Wersja 2.0</summary>
 
+> - [ ] Rework wszystkiego bo dlaczego nie
 > - [ ] Wsparcie roczników IV - VIII
 > - [ ] Wsparcie klas ukierunkowanych
 

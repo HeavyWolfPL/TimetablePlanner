@@ -4,6 +4,9 @@
 	"_Separator2_": 	"---------------------------",
     
 	"debug": false,
+	"log_cleanup_mode": "number",
+	"log_cleanup_amount": 5,
+
 
 	"_Separator3_": 	"---------------------------",
 	"_DziennikConfig_": "-----Database Settings-----",
@@ -14,6 +17,7 @@
 	"db_pass": "PASSWORD_GOES_HERE",
 	"db_database": "timetable_planner",
 
+	
 	"_Separator98_": 	"---------------------------",
 	"_Wafel_": 			"-------Wafelowski.pl-------",
 	"_Separator99_": 	"---------------------------"

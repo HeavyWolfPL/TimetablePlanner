@@ -56,11 +56,12 @@ class Testing():
     def __init__(self):
         self.self = self
 
+    def main(self):
+        print("Funkcja testowa")
+
     def test(self):
-        result = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy WHERE klasa = '5A'")
+        result = DatabaseTools.databaseModify(self, "INSERT INTO `przydzieleni_nauczyciele` (`Przedmiot`, `Nauczyciel`, `Klasa`) VALUES ('Edukacja wczesnoszkolna', 'Pamela Gieldud', '1D')", Testing)
         print(result)
-        if result == []:
-            print("Nie znaleziono klasy")
 ### Testing ###
 
 
@@ -78,5 +79,10 @@ class Restart():
 
 if __name__ == "__main__":
     LoggingTools.initialize_logging()
+    LoggingTools.cleanup()
     App = Program()
     App.main_menu()
+
+# TODO: On Exit
+# import atexit
+# atexit.register(print, 'goodbye.')

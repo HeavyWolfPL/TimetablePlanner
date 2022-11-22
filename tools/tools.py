@@ -1,12 +1,19 @@
-import os
+#############
+# MiscTools #
+#############
+import os # cls 
 
-# DatabaseTool
+################
+# DatabaseTool #
+################
 import json
 import mysql.connector
 from mysql.connector import errorcode
 from sys import _getframe
 
-# LoggingHandler
+##################
+# LoggingHandler #
+##################
 import logging
 from datetime import datetime
 from pathlib import Path
@@ -21,6 +28,13 @@ class MiscTools():
 
     def cls():
         os.system('cls' if os.name=='nt' else 'clear')
+
+    def find(self, filtr, data):
+        """Return first item in sequence where f(item) == True."""
+        # classroom_type = find(lambda ClassroomType: ClassroomType.name == 'Uniwersalna', sale_rodzaje)
+        for item in data:
+            if filtr(item):
+                return item        
 
 class DatabaseTools():
     def __init__(self):
@@ -50,7 +64,7 @@ class DatabaseTools():
                 # TODO: Sprawdzić czy podano hasło i zmieniono wartości
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Baza danych nie istnieje.")
-                # TODO: Uzupełnić błąd
+                # TODO Uzupełnić błąd
             else:
                 print(err)
 
@@ -74,7 +88,8 @@ class DatabaseTools():
         """
 
         query = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy")
-        #TODO: Walidacja bazy danych
+        #TODO Walidacja bazy danych
+        #TODO Usuwanie polskich znaków
 
     # MariaDB Error Codes
     # https://mariadb.com/kb/en/mariadb-error-codes/
@@ -98,7 +113,7 @@ class DatabaseTools():
             cursor.execute(query)
             result = cursor.fetchall()
         except mysql.connector.Error as err:
-            # TODO: Wypełnić błędy
+            # TODO Wypełnić błędy
             if debug:
                 print("Error Code:", err.errno)
                 print("SQLSTATE:", err.sqlstate)
@@ -122,7 +137,7 @@ class DatabaseTools():
 
         if result == []:
             # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
-            # TODO: Chyba zły pomysł
+            # TODO Chyba zły pomysł
             result = False
 
         LoggingTools.log(self, f'Zapytanie SQL: "{query}" \nZwrócono: "{result}"', "debug")
@@ -147,7 +162,7 @@ class DatabaseTools():
             cursor.execute(command)
             database.commit()
         except mysql.connector.Error as err:
-            # TODO: Wypełnić błędy
+            # TODO Wypełnić błędy
             if debug:
                 print("Error Code:", err.errno)
                 print("SQLSTATE", err.sqlstate)
@@ -175,7 +190,7 @@ class DatabaseTools():
         result = cursor.rowcount
         if result == []:
             # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
-            # TODO: Chyba zły pomysł
+            # TODO Chyba zły pomysł
             result = False
 
         LoggingTools.log(self, f'Zapytanie SQL: "{command}" \nZmodyfikowane wiersze: "{result}"', "debug")

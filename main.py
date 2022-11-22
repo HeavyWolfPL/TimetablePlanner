@@ -1,16 +1,19 @@
 # Main Tools
+from tools.setup import Setup
 from tools.generator import Generator
 from tools.editor import Editor
 from tools.viewer import Viewer
 
 # Misc Tools
 from tools.tools import LoggingTools
+from tools.tools import MiscTools
 
 class Program():
     def __init__(self):
         self.self = self
 
     def main_menu(self):
+        MiscTools.cls()
 
         print("""
         __________                 _        _     _      _____  _                             
@@ -25,10 +28,11 @@ class Program():
         """)
         
         temp = ""
-        while temp.lower() not in ["1", "2", "3", "e", "exit", "4"]:
+        while temp.lower() not in ["0", "1", "2", "3", "e", "exit", "4"]:
             temp = input("""
     Wybierz tryb działania programu, wpisz odpowiedni znak i zatwierdź klawiszem Enter. 
 
+    0 - Konfigurator danych
     1 - Generator
     2 - Edytor Danych
     3 - Przegląd danych
@@ -37,8 +41,9 @@ class Program():
         
     Wybór: """)
 
-        
-        if temp == "1":
+        if temp == "0":
+            Setup.main(self)
+        elif temp == "1":
             Generator.main(self)
         elif temp == "2":
             Editor.main(self)
@@ -52,6 +57,8 @@ class Program():
 
 ### Testing ###
 from tools.tools import DatabaseTools
+from tools.generator import GeneratorTools
+import json
 class Testing():
     def __init__(self):
         self.self = self
@@ -60,8 +67,9 @@ class Testing():
         print("Funkcja testowa")
 
     def test(self):
-        result = DatabaseTools.databaseModify(self, "INSERT INTO `przydzieleni_nauczyciele` (`Przedmiot`, `Nauczyciel`, `Klasa`) VALUES ('Edukacja wczesnoszkolna', 'Pamela Gieldud', '1D')", Testing)
-        print(result)
+        # result = DatabaseTools.databaseModify(self, "INSERT INTO `przydzieleni_nauczyciele` (`Przedmiot`, `Nauczyciel`, `Klasa`) VALUES ('Edukacja wczesnoszkolna', 'Pamela Gieldud', '1D')", Testing)
+        print(GeneratorTools.get_data(self))
+        print("Koniec funkcji testowej")
 ### Testing ###
 
 
@@ -83,6 +91,6 @@ if __name__ == "__main__":
     App = Program()
     App.main_menu()
 
-# TODO: On Exit
+# TODO On Exit
 # import atexit
 # atexit.register(print, 'goodbye.')

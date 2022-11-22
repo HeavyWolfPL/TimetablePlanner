@@ -3,25 +3,26 @@ from typing import List, Union
 
 # LessonHour, Classroom, Subject, Teacher, Class, Lesson, Timetable
 @dataclass
-class Flags:
-    early: bool = False
-    late: bool = False
-
-@dataclass
 class LessonHour:
+    lp: int
     start: str
     end: str
-    hour_flags: List[Flags]
+
+@dataclass
+class ClassroomType:
+    name: str
 
 @dataclass
 class Classroom:
     name: str
-    type: str
+    classroom_type: ClassroomType
     max_students: int
+
 
 @dataclass
 class Subject:
     name: str
+    classroom_type: ClassroomType
     teacher_preference: int # 0 - any subject teacher, 1 - headteacher
     first_class_hr: int
     second_class_hr: int
@@ -29,35 +30,50 @@ class Subject:
 
 @dataclass
 class Teacher:
-    name: str
     short_name: str
-    subjects: str
+    name: str
+    subject: Subject
     headteacher: int # 0 - nope, 1 - can be / is
     hours: int
 
 @dataclass
-class Class:
+class ClassTeam:
     name: str
     students: int
-    headteacher: str
-    # subjects: List[Subject]
-    # teachers: List[Union[Subject, str]]
-    # hour_flags: List[Flags]
-    # classroom: str
+    headteacher: Teacher
+    classroom: Classroom
 
 @dataclass
-class Lesson:
+class AssignedTeacher:
+    lp: int
+    subject: Subject
+    teacher: Teacher
+    assigned_class: ClassTeam
+
+@dataclass
+class Lesson: # format lekcji w bazie danych - [przedmiot, nauczyciel, sala]
+    assigned_class: ClassTeam
     hour: LessonHour
     classroom: Classroom
     subject: Subject
     teacher: Teacher
-    class_: Class
 
 @dataclass
 class Timetable:
-    class_: Class
+    class_: ClassTeam
     monday: List[Lesson]
     tuesday: List[Lesson]
     wednesday: List[Lesson]
     thursday: List[Lesson]
     friday: List[Lesson]
+
+@dataclass
+class DataPack:
+    lesson_hours: List[LessonHour]
+    classroom_types: List[ClassroomType]
+    classrooms: List[Classroom]
+    subjects: List[Subject]
+    teachers: List[Teacher]
+    classes: List[ClassTeam]
+    assigned_teachers: List[AssignedTeacher]
+    timetables: List[Timetable]

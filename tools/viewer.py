@@ -38,24 +38,23 @@ class Viewer():
         elif temp == "3":
             Viewer.show_subjects()
         elif temp == "4":
-            #TODO:
+            #TODO
             #Viewer.show_rooms()
             return
         elif temp == "5":
-            #TODO:
+            #TODO
             #Viewer.show_timetable()
             return
         elif temp.lower() in ["e", "exit", "q", "quit"]:
             exit()
-            # Restart.rerun() #TODO: ImportError: cannot import name 'Viewer' from partially initialized module 'tools.viewer' (most likely due to a circular import)
-
+            # Restart.rerun() #TODO ImportError: cannot import name 'Viewer' from partially initialized module 'tools.viewer' (most likely due to a circular import)
 
     def show_classes(self, filtr = None):
         rows = []
         headers = ["Klasa", "Nauczyciel", "Sala", "Uczniowie"]
 
         if filtr.lstrip().rstrip():
-            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM klasy WHERE {filtr} in (KLASA, WYCHOWAWCA)", Viewer)
+            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM klasy WHERE {filtr} IN (klasa, wychowawca)", Viewer)
         else:
             query = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy", Viewer)
 

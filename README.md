@@ -33,20 +33,22 @@ Placeholder
 <summary>Wersja 1.0</summary>
 
 #### 1. Baza danych
-> - [ ] Tabele:
+> - [x] Tabele:
 >   - [x] Nauczyciele
 >   - [x] Przedmioty
 >   - [x] Klasy
 >   - [x] Sale
->   - [ ] Plan lekcji
-> - [ ] Wprowadzenie zabezpieczeń przed idiotyczną zmianą danych / Walidacja danych
+>   - [x] Plan lekcji
+> - [x] Wprowadzenie zabezpieczeń przed idiotyczną zmianą danych / Walidacja danych
 > - [x] MS Access -> SQL -> phpMyAdmin
 > - [x] Dostęp z serwera
 > - [x] Wprowadzenie samych danych
 
 #### 2. Generator
-> - [ ] Generowanie planu na gotowych danych
-> - [ ] Przydzielanie sali do klasy na bazie wolnych sal i liczby osób
+> - [x] Generowanie planu na gotowych danych
+> - [ ] Przydzielanie sali do klasy na bazie:
+>   - [x] wolnych sal
+>   - [ ] liczby osób
 > - [x] Przydzielenie nauczyciela do klasy na bazie etatu
 > - [x] Przedmioty wychowawcy
 >   - 0 = Dowolny nauczyciel przedmiotu
@@ -70,10 +72,30 @@ Placeholder
 </details>
 
 <details>
+<summary>Wersje 1.1 - 1.9</summary>
+
+> - [ ] Nauczyciele z więcej niż jednym przedmiotem
+> - [ ] Automatyczne przydzielenie wychowawcy (opcjonalna funkcja)
+> - [ ] Lekcje grupowe
+> - [ ] Walidacja danych w sposób bardzo rozległy
+
+</details>
+
+<details>
 <summary>Wersja 2.0</summary>
 
 > - [ ] Rework wszystkiego bo dlaczego nie
 > - [ ] Wsparcie roczników IV - VIII
 > - [ ] Wsparcie klas ukierunkowanych
+> - [ ] Etaty
+
+</details>
+
+<details>
+<summary>Wersja 3.0</summary>
+
+> - [ ] Wsparcie dla szkół średnich
+> - [ ] Wersja w bardziej zoptymalizowanym języku (JS?)
+> - [ ] Generator zastępstw
 
 </details>

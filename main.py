@@ -59,6 +59,8 @@ class Program():
 from tools.tools import DatabaseTools
 from tools.generator import GeneratorTools
 import json
+from alive_progress import alive_bar
+import time
 class Testing():
     def __init__(self):
         self.self = self
@@ -66,9 +68,17 @@ class Testing():
     def main(self):
         print("Funkcja testowa")
 
+    def compute():
+        for i in range(100):
+            time.sleep(0.05)
+            yield
+
     def test(self):
         # result = DatabaseTools.databaseModify(self, "INSERT INTO `przydzieleni_nauczyciele` (`Przedmiot`, `Nauczyciel`, `Klasa`) VALUES ('Edukacja wczesnoszkolna', 'Pamela Gieldud', '1D')", Testing)
-        print(GeneratorTools.get_data(self))
+        with alive_bar(100) as bar: # TODO: https://github.com/rsalmei/alive-progress
+            for i in Testing.compute():
+                bar()
+        Testing.compute()
         print("Koniec funkcji testowej")
 ### Testing ###
 

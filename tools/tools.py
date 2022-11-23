@@ -143,14 +143,15 @@ class DatabaseTools():
         LoggingTools.log(self, f'Zapytanie SQL: "{query}" \nZwrócono: "{result}"', "debug")
         return result
 
-    def databaseModify(self, command, on_fail = None):
+    def databaseModify(self, command, on_fail = None, multiple_statements = False, rollback_on_error = False):
         """
         Wykonuje polecenie SQL, tzw. komenda.
 
         Parametry:
-            self - referencja do obiektu
-            command - polecenie SQL
-            on_fail - klasa funkcji, która ma być wywołana w przypadku błędu.
+            self - referencja do obiektu\n
+            command - polecenie SQL\n
+            on_fail - klasa funkcji, która ma być wywołana w przypadku błędu\n
+            multiple_statements - więcej niż jedno polecenie SQL w wywołaniu funkcji
 
         Zwraca:
             int - wartość dodanych/zmienionych wierszy
@@ -158,34 +159,65 @@ class DatabaseTools():
         database = DatabaseTools.databaseGet(self)
         cursor = database.cursor()
 
-        try:
-            cursor.execute(command)
-            database.commit()
-        except mysql.connector.Error as err:
-            # TODO Wypełnić błędy
-            if debug:
-                print("Error Code:", err.errno)
-                print("SQLSTATE", err.sqlstate)
-                print("Message", err.msg)
-                print("Query:", command)
-            if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Błędne hasło lub login.")
-                LoggingTools.log(self, "Błędne hasło lub login.", "crash", _getframe().f_lineno)
-            elif err.errno == errorcode.ER_BAD_FIELD_ERROR: # Error code - 1054 aka Unknown column '%s' in '%s'
-                print("Nie znaleziono wyników zgodnych z podanym filtrem.")
-                LoggingTools.log(self, f"Nie znaleziono klasy zgodnej z podanym filtrem.", "debug")
-                input("Naciśnij Enter, aby wrócić do menu głównego.")
-            elif err.errno == errorcode.ER_DUP_ENTRY: # Error code - 1062 aka Duplicate entry
-                print("Wprowadzona wartość już istnieje w bazie danych.")
-                LoggingTools.log(self, f'Wprowadzona wartość już istnieje w bazie danych. \nZapytanie SQL: "{command}"', "debug")
-                input("Naciśnij Enter, aby wrócić do menu głównego.")
+        if not multiple_statements:
+            try:
+                cursor.execute(command)
+                database.commit()
+            except mysql.connector.Error as err:
+                # TODO Wypełnić błędy
+                if debug:
+                    print("Error Code:", err.errno)
+                    print("SQLSTATE", err.sqlstate)
+                    print("Message", err.msg)
+                    print("Query:", command)
+                if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+                    print("Błędne hasło lub login.")
+                    LoggingTools.log(self, "Błędne hasło lub login.", "crash", _getframe().f_lineno)
+                elif err.errno == errorcode.ER_BAD_FIELD_ERROR: # Error code - 1054 aka Unknown column '%s' in '%s'
+                    print("Nie znaleziono wyników zgodnych z podanym filtrem.")
+                    LoggingTools.log(self, f"Nie znaleziono klasy zgodnej z podanym filtrem.", "debug")
+                    input("Naciśnij Enter, aby wrócić do menu głównego.")
+                elif err.errno == errorcode.ER_DUP_ENTRY: # Error code - 1062 aka Duplicate entry
+                    print("Wprowadzona wartość już istnieje w bazie danych.")
+                    LoggingTools.log(self, f'Wprowadzona wartość już istnieje w bazie danych. \nZapytanie SQL: "{command}"', "debug")
+                    input("Naciśnij Enter, aby wrócić do menu głównego.")
+                else:
+                    print("Wystąpił nieznany błąd. Odpowiednia treść została zapisana w logu.")
+                    LoggingTools.log(self, f"Wystąpił nieznany błąd: \nSQL - {command} \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
+                    input("Naciśnij Enter, aby wrócić do menu głównego.")
+                
+                if on_fail != None:
+                    on_fail.main(self)
+
+        if multiple_statements: # TODO Zrobić bardziej czytelne dla oka
+            """
+            Execute multiple SQL statements and returns the cursor from the last executed statement.
+
+            :param conn: The connection to the database
+            :type conn: Database connection
+
+            :param statements: The statements to be executed
+            :type statements: A list of strings
+
+            :param: rollback_on_error: Flag to indicate action to be taken on an exception
+            :type rollback_on_error: bool
+
+            :returns cursor from the last statement executed
+            :rtype cursor
+            """
+
+            try:
+                for statement in command:
+                    cursor.execute(statement)
+                    if not rollback_on_error:
+                        database.commit() # commit on each statement
+            except Exception as e:
+                if rollback_on_error:
+                    database.rollback()
+                raise
             else:
-                print("Wystąpił nieznany błąd. Odpowiednia treść została zapisana w logu.")
-                LoggingTools.log(self, f"Wystąpił nieznany błąd: \nSQL - {command} \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
-                input("Naciśnij Enter, aby wrócić do menu głównego.")
-            
-            if on_fail != None:
-                on_fail.main(self)
+                if rollback_on_error:
+                    database.commit() # then commit only after all statements have completed successfully
 
         result = cursor.rowcount
         if result == []:

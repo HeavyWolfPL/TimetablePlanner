@@ -15,6 +15,7 @@ from sys import _getframe
 from tools.tools import DatabaseTools
 
 # GeneratorTools
+from random import shuffle # shuffle list
 from math import ceil # calculate_average_hours
 
 class Generator():
@@ -170,34 +171,87 @@ class Generator():
 
         # print(data)
         # print()
-        for class_team in data.classes:
-            lesson_hours = GeneratorTools.calculate_average_hours(self, data.subjects, class_team)
+        
+        for school_class in data.classes:
+            total_lessons = []
+            # TODO Losowa kolejność klas?
+            lesson_hours = GeneratorTools.calculate_average_hours(self, data.subjects, school_class)
             if lesson_hours > len(data.lesson_hours):
-                print(f"Klasa {class_team.name} ma więcej godzin lekcyjnych niż przewiduje plan lekcji. Nie można wygenerować planu lekcji.")
-                LoggingTools.log(self, f"Klasa {class_team.name} ma więcej godzin lekcyjnych niż przewiduje plan lekcji. Nie można wygenerować planu lekcji.", "error", _getframe().f_lineno)
+                print(f"Klasa {school_class.name} ma więcej godzin lekcyjnych niż przewiduje plan lekcji. Nie można wygenerować planu lekcji.")
+                LoggingTools.log(self, f"Klasa {school_class.name} ma więcej godzin lekcyjnych niż przewiduje plan lekcji. Nie można wygenerować planu lekcji.", "error", _getframe().f_lineno)
                 return False
 
-            total_lessons = []
-            for day in days:
+            subjects = []
+            for subject in data.subjects: # Calculate subjects with hours here
+                subjects.append(GeneratorTools.calculate_subject_hours(self, subject, school_class))
+
+            subjects2 = []
+            for subject in subjects: # Because calculate_subject_hours() returns each subject as a list of subject+hours, we need to unpack it
+                if str(type(subject)) == "<class 'list'>":
+                    for sub in subject:
+                        subjects2.append(sub)
+                else:
+                    subjects2.append(subject)
+            subjects = subjects2
+            del subjects2 # Remove unused list
+            shuffle(subjects) # Randomize the order of subjects
+
+            print("Zakończono obliczanie godzin lekcyjnych dla klasy.")
+
+            days_lessons = []
+            for day in days: # Check for availability and shit here
                 lessons = []
-                for lesson_hour in range(1, lesson_hours):
-                    for subject in data.subjects:
-                        assigned_teacher = MiscTools.find(self, lambda AssignedTeacher: ((AssignedTeacher.subject == subject) and (AssignedTeacher.assigned_class == class_team)), data.assigned_teachers)
+                for lesson_hour in range(1, lesson_hours + 1):
+                    print(f" ------------------------\n Godz. lekcyjna {lesson_hour} | {day[1]} | {school_class.name}\n ------------------------\n")
+                    for i, subject in enumerate(subjects):
+                        if subject == None:
+                            continue
+
+                        assigned_teacher = MiscTools.find(self, lambda AssignedTeacher: ((AssignedTeacher.subject == subject) and (AssignedTeacher.assigned_class == school_class)), data.assigned_teachers)
+                        if not GeneratorTools.teacher_availability(self, assigned_teacher.teacher, day, lesson_hour):
+                            subjects.append(subject)
+                            subjects[i] = None
+                            continue
+
+                        room = GeneratorTools.find_classroom(self, subject.classroom_type, day, lesson_hour)
+                        if room == None:
+                            subjects.append(subject)
+                            subjects[i] = None
+                            continue
+
                         lessons.append(Lesson(
-                            assigned_class = class_team.name,
+                            assigned_class = school_class.name,
                             hour = lesson_hour, 
-                            classroom = GeneratorTools.find_classroom(self, subject.classroom_type, day, lesson_hour),
+                            classroom = room,
                             subject = subject.name,
                             teacher = assigned_teacher.teacher.short_name,
-                    ))
-                total_lessons.append(lessons)
-            print(total_lessons)
+                        ))
 
-            with open(f"data/plany_lekcji/{class_team.name}.txt", "w", encoding="UTF-8") as file:
-                file.write(str(total_lessons))
-                # json.dump(total_lessons, file, skipkeys=True, indent=4)
+                        subjects[i] = None
+                        break
+                    
+                days_lessons.append([day[0], lessons])
 
-        # query = DatabaseTools.databaseModify(self, f"INSERT INTO `plan_lekcji` (`Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek`) VALUES ('{class_team.name}', '{lesson_hour}', 'x', 'x', 'x', 'x', 'x');", Generator)
+            while None in subjects:
+                subjects.remove(None)
+
+            if len(subjects) != 0:
+                print(subjects) # TODO Add error logging here
+
+
+            #total_lessons.append(Timetable(
+            total_lessons = Timetable(
+                assigned_class = school_class,
+                monday = days_lessons[0][1],
+                tuesday = days_lessons[1][1],
+                wednesday = days_lessons[2][1],
+                thursday =  days_lessons[3][1],
+                friday = days_lessons[4][1]
+            )
+            GeneratorTools.upload_timetable(self, total_lessons)
+
+            # with open(f"data/plany_lekcji/{school_class.name}.txt", "w", encoding="UTF-8") as file:
+            #     file.write(str(total_lessons))
 
         print("Zakończono generowanie planu lekcji.")
 
@@ -287,7 +341,7 @@ class GeneratorTools():
                 sql[i] = Teacher(
                     short_name = element[0], 
                     name = element[1], 
-                    subject = MiscTools.find(self, lambda Subject: Subject.name == element[1], data.subjects), 
+                    subject = MiscTools.find(self, lambda Subject: Subject.name == element[2], data.subjects), 
                     headteacher = element[3], 
                     hours = element[4]
                 )
@@ -332,7 +386,50 @@ class GeneratorTools():
             total = subject.third_class_hr
 
         return total
-        # TODO Couple hours in a row, aka blocks
+
+    # def calculate_subject_hours(self, subject, school_class):
+    #     total_hours = GeneratorTools.calculate_hours(self, subject, school_class)
+    #     subjectHours = []
+
+    #     if total_hours % 3 == 0:
+    #         n = int(total_hours / 3)
+    #     elif total_hours % 2 == 0:
+    #         n = int(total_hours / 2)
+    #     else:
+    #         n = round(int(total_hours / 2))
+
+    #     if n <= 0:
+    #         n = 1
+
+    #     # if we cant split hours into parts
+    #     if(total_hours < n):
+    #         return [[subject, total_hours]]
+    #     elif ((total_hours % n) == 0):
+    #         for i in range(n):
+    #             subjectHours.append([subject, int(total_hours // n)])
+    #             #print(f"{total_hours // n} ")
+    #     else:
+    #         wieksze = n - (total_hours % n)
+    #         mniejsze = total_hours // n
+            
+    #         for i in range(n):
+    #             if(i >= wieksze):
+    #                 subjectHours.append([subject, mniejsze + 1])
+    #                 # print(f"{mniejsze + 1} ")
+    #             else:
+    #                 subjectHours.append([subject, mniejsze])
+    #                 #print(f"{mniejsze} ")
+
+    #     return subjectHours
+
+    def calculate_subject_hours(self, subject, school_class):
+        total_hours = GeneratorTools.calculate_hours(self, subject, school_class)
+        subjectHours = []
+
+        for i in range(total_hours):
+            subjectHours.append(subject)
+
+        return subjectHours
 
     def calculate_average_hours(self, subjects, school_class):
         hours = 0
@@ -347,13 +444,27 @@ class GeneratorTools():
         return None
 
     def teacher_availability(self, teacher, day, hour):
+        """
+        Sprawdza dostępność nauczyciela o podanym dniu i godzinie lekcyjnej
+
+        Parametry:
+            self - referencja do obiektu\n
+            teacher - nauczyciel w formie dataclassy Teacher\n
+            day - dzien w formie [Index, Nazwa bez polskich znaków]\n
+            hour - godzina lekcyjna w formie numeru\n
+
+        Zwraca:
+            Bool (True/False) - dostępność nauczyciela
+        """
+
         lessons = DatabaseTools.databaseQuery(self, f"SELECT {day[1]} FROM `plan_lekcji` WHERE `GodzinaLekcyjna` = '{hour}' LIMIT 0, 50", Generator)
         if not lessons:
             LoggingTools.log(self, f"[Generator Tools | teacher_availability] Nie zwrocono żadnych danych o zajęciach na godzinę {hour} dnia {day}.", "info", _getframe().f_lineno)
             return True
         else:
             for lesson in lessons:
-                if lesson[1] == teacher.short_name:
+                lesson = lesson[0].lstrip().rstrip().split(", ")
+                if lesson[4] == teacher.short_name:
                     return False
             return True
 
@@ -370,6 +481,7 @@ class GeneratorTools():
 
     def find_classroom(self, subject_type, day, hour):
         classrooms = DatabaseTools.databaseQuery(self, f"SELECT * FROM `sale` WHERE `Rodzaj` = '{subject_type.name}' LIMIT 0, 50", Generator)
+        shuffle(classrooms)
 
         if not classrooms:
             LoggingTools.log(self, f"[Generator Tools | find_classroom] Nie znaleziono żadnej sali o typie {subject_type.name}.", "info", _getframe().f_lineno)
@@ -380,3 +492,48 @@ class GeneratorTools():
                     return classroom
             return None
 
+    def upload_timetable(self, timetable):
+        school_class = timetable.assigned_class
+        days = [timetable.monday, timetable.tuesday, timetable.wednesday, timetable.thursday, timetable.friday]
+
+        x = ((len(timetable.monday) + len(timetable.tuesday) + len(timetable.wednesday) + len(timetable.thursday) + len(timetable.friday)) // 5) + 1
+
+        lessonsHours = []
+        for i in range(0, x):
+            lessonsHours.append([])
+
+        del x
+
+        for day in days:
+            for lesson in day:
+                lessonsHours[lesson.hour-1].append(lesson)
+
+        for i, hour in enumerate(lessonsHours):
+            lessons = []
+            for lesson in hour:
+                lessons.append([lesson.assigned_class, lesson.hour, lesson.classroom[0], lesson.subject, lesson.teacher])
+            lessonsHours[i] = lessons
+
+        json_data = json.dumps(lessonsHours, indent=4)
+
+        sql = []
+        for i, hour in enumerate(lessonsHours, 1):
+            while len(hour) != 5:
+                hour.append([])
+            sql.append(f'INSERT INTO `plan_lekcji` (`Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek`) VALUES ("{school_class.name}", {i}, "{hour[0]}", "{hour[1]}", "{hour[2]}", "{hour[3]}", "{hour[4]}");')
+        
+        query = DatabaseTools.databaseModify(
+            self = self,
+            command = f"DELETE FROM `plan_lekcji` WHERE `plan_lekcji`.`Klasa` = '{school_class.name}'",
+        )
+
+        query = DatabaseTools.databaseModify(
+            self = self, 
+            command = sql,
+            on_fail = Generator,
+            multiple_statements = True
+        )
+
+        if not query:
+            LoggingTools.log(self, f"[Generator Tools | upload_timetable] Nie udało się zapisać planu lekcji do bazy danych. SQL: \n{sql}", "error", _getframe().f_lineno)
+            return False

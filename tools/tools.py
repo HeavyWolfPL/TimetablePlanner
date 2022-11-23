@@ -104,7 +104,7 @@ class DatabaseTools():
             on_fail - klasa funkcji, która ma być wywołana w przypadku błędu.
 
         Zwraca:
-            result - wartość zwróconą przez zapytanie SQL
+            result - wartość zwróconą przez zapytanie SQL lub False
         """
         database = DatabaseTools.databaseGet(self)
         cursor = database.cursor()
@@ -287,7 +287,7 @@ class LoggingTools():
         elif log_type == "error":
             timetable_logs.error(f"{message} {line}")
         elif log_type in ["crash", "critical"]:
-            with open (f"logs/[Crash] {now}.log", "w") as crash_log:
+            with open (f"logs/[Crash] {now}.log", "w", encoding="UTF-8") as crash_log:
                 crash_log.write(f"""
                 ---------------------------
                 Timetable Planner Crash Log

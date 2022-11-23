@@ -49,6 +49,7 @@ Placeholder
 > - [ ] Przydzielanie sali do klasy na bazie:
 >   - [x] wolnych sal
 >   - [ ] liczby osób
+>   - [ ] sali "klasowej" aka sala przydzielona do danej klasy
 > - [x] Przydzielenie nauczyciela do klasy na bazie etatu
 > - [x] Przedmioty wychowawcy
 >   - 0 = Dowolny nauczyciel przedmiotu

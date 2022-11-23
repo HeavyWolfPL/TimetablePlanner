@@ -64,11 +64,11 @@ class Viewer():
             LoggingTools.log(self, f"Nie znaleziono klasy zgodnej z podanym filtrem: '{filtr}'", "debug")
             Viewer.main(self)
 
-        for classs in query:
-            class_name = classs[0]
-            teacher = classs[3]
-            room = classs[4]
-            students = classs[2]
+        for school_class in query:
+            class_name = school_class[0]
+            teacher = school_class[2]
+            room = school_class[3]
+            students = school_class[1]
             rows.append([class_name, teacher, room, students])
 
         table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
@@ -82,7 +82,7 @@ class Viewer():
     
     def show_teachers(self, filtr = None): 
         rows = []
-        headers = ["Lp.", "Imię i Nazwisko", "Przedmiot"]
+        headers = ["Imię i Nazwisko", "Przedmiot", "Wychowawstwo", "Godziny"]
 
         if filtr.lstrip().rstrip():
             query = DatabaseTools.databaseQuery(self, f"SELECT * FROM nauczyciele WHERE '{filtr}' in (IMIENAZWISKO, SKROT, PRZEDMIOT)", Viewer)
@@ -96,10 +96,11 @@ class Viewer():
             Viewer.main(self)
 
         for teacher in query:
-            teacher_position = teacher[0]
-            teacher_name = f"{teacher[1]} ({teacher[2]})"
-            teacher_subject = teacher[3]
-            rows.append([teacher_position, teacher_name, teacher_subject])
+            teacher_name = f"{teacher[1]} ({teacher[0]})"
+            teacher_subject = teacher[2]
+            teacher_headteaching = teacher[3]
+            teacher_hours = teacher[4]
+            rows.append([teacher_name, teacher_subject, teacher_headteaching, teacher_hours])
 
         table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
 
@@ -111,7 +112,7 @@ class Viewer():
 
     def show_subjects(self, filtr = None):
         rows = []
-        headers = ["Przedmiot", "I Klasa / Godziny", "II Klasa / Godziny", "III Klasa / Godziny"]
+        headers = ["Przedmiot", "Typ sali", "Przedmiot wychowawcy", "I Klasa / Godziny", "II Klasa / Godziny", "III Klasa / Godziny"]
 
         if filtr.lstrip().rstrip():
             query = DatabaseTools.databaseQuery(self, f"SELECT * FROM przedmioty WHERE {filtr} in (Nazwa, godziny_klasa_1, godziny_klasa_2, godziny_klasa_3)", Viewer)
@@ -126,10 +127,12 @@ class Viewer():
         
         for subject in query:
             name = subject[0]
-            class1_hours = subject[1]
-            class2_hours = subject[2]
-            class3_hours = subject[3]
-            rows.append([name, class1_hours, class2_hours, class3_hours])
+            classroom_type = subject[1]
+            headteacher_subject = subject[2]
+            class1_hours = subject[3]
+            class2_hours = subject[4]
+            class3_hours = subject[5]
+            rows.append([name, classroom_type, headteacher_subject, class1_hours, class2_hours, class3_hours])
 
         table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
 

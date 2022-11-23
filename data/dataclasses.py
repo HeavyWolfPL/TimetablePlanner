@@ -60,7 +60,7 @@ class Lesson: # format lekcji w bazie danych - [przedmiot, nauczyciel, sala]
 
 @dataclass
 class Timetable:
-    class_: ClassTeam
+    assigned_class: ClassTeam
     monday: List[Lesson]
     tuesday: List[Lesson]
     wednesday: List[Lesson]

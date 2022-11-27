@@ -49,7 +49,8 @@
             {"Sala": "A1", "Rodzaj": "Językowa", "Miejsca": "15"},
             {"Sala": "A2", "Rodzaj": "Językowa", "Miejsca": "15"},
             {"Sala": "I1", "Rodzaj": "Informatyczna", "Miejsca": "15"},
-            {"Sala": "SG", "Rodzaj": "Wychowanie-Fizyczne", "Miejsca": "15"}
+            {"Sala": "SG1", "Rodzaj": "Wychowanie-Fizyczne", "Miejsca": "15"},
+            {"Sala": "SG2", "Rodzaj": "Wychowanie-Fizyczne", "Miejsca": "15"}
         ],
         "przedmioty": [
             {"Nazwa": "Edukacja wczesnoszkolna", "RodzajSali": "Uniwersalna", "PrzedmiotWychowawcy": "1", "godziny_klasa_1": "16", "godziny_klasa_2": "16", "godziny_klasa_3": "16"},
@@ -77,7 +78,8 @@
             {"Skrot":"OK","ImieNazwisko":"Oliwia Krajewska","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
             {"Skrot":"PC","ImieNazwisko":"Paulina Cukierman","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
             {"Skrot":"PG","ImieNazwisko":"Pamela Gieldud","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
-            {"Skrot":"ST","ImieNazwisko":"Sebastian Taber","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"}
+            {"Skrot":"ST","ImieNazwisko":"Sebastian Taber","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"RL","ImieNazwisko":"Robert Laik","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"}
         ],
         "klasy": [
             {"Klasa": "1A", "Osoby": "30", "Wychowawca": "Paulina Cukierman", "Sala": "1"},

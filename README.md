@@ -56,7 +56,7 @@ Placeholder
 >   - 1 = Wychowawca
 > - [x] Połączenie z bazą danych
 > - [ ] Zapis danych tymczasowo jako XML/JSON
-> - [ ] Komunikacja przez PyScript
+> - [ ] ~~Komunikacja przez PyScript~~
 
 #### 3. Strona
 > - [ ] Prototyp wyglądu strony na bazie placeholderowych tabelek

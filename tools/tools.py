@@ -56,22 +56,27 @@ class DatabaseTools():
                 database = db_database,
             )
         except mysql.connector.Error as err:
-            # print("Error Code:", err.errno)
-            # print("SQLSTATE", err.sqlstate)
-            # print("Message", err.msg)
+            if debug:
+                print("Error Code:", err.errno)
+                print("SQLSTATE:", err.sqlstate)
+                print("Message:", err.msg)
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
-                print("Błędne hasło lub login.")
-                # TODO: Sprawdzić czy podano hasło i zmieniono wartości
+                if db_ip == "IP_GOES_HERE":
+                    print("Nie podano adresu IP serwera bazy danych.")
+                    LoggingTools.log(self, "Błędny adres bazy danych.", "crash")
+                if db_user == "USER_GOES_HERE":
+                    print("Nie podano nazwy użytkownika bazy danych.")
+                    LoggingTools.log(self, "Błędna nazwa użytkownika bazy danych.", "crash")
+                if db_pass == "PASS_GOES_HERE":
+                    print("Nie podano hasła bazy danych.")
+                    LoggingTools.log(self, "Błędne hasło użytkownika bazy danych.", "crash")
             elif err.errno == errorcode.ER_BAD_DB_ERROR:
                 print("Baza danych nie istnieje.")
-                # TODO Uzupełnić błąd
+                LoggingTools.log(self, "Błędna nazwa bazy danych.", "crash")
             else:
-                print(err)
+                LoggingTools.log(self, f"Wystąpił nieznany błąd: \nKod - {err.errno} \nTreść - {err.msg} \nSQL State - {err.sqlstate} \nCałość - {err}", "error", _getframe().f_lineno)
 
-    
         LoggingTools.log(self, "Połączono z bazą danych.")
-
-
         # database.close()
         return database
 
@@ -89,7 +94,7 @@ class DatabaseTools():
 
         query = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy")
         #TODO Walidacja bazy danych
-        #TODO Usuwanie polskich znaków
+        # Sprawdzić czy każda tabelka ma jakieś linijki
 
     # MariaDB Error Codes
     # https://mariadb.com/kb/en/mariadb-error-codes/
@@ -113,7 +118,6 @@ class DatabaseTools():
             cursor.execute(query)
             result = cursor.fetchall()
         except mysql.connector.Error as err:
-            # TODO Wypełnić błędy
             if debug:
                 print("Error Code:", err.errno)
                 print("SQLSTATE:", err.sqlstate)
@@ -136,8 +140,6 @@ class DatabaseTools():
                 
 
         if result == []:
-            # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
-            # TODO Chyba zły pomysł
             result = False
 
         LoggingTools.log(self, f'Zapytanie SQL: "{query}" \nZwrócono: "{result}"', "debug")
@@ -151,7 +153,8 @@ class DatabaseTools():
             self - referencja do obiektu\n
             command - polecenie SQL\n
             on_fail - klasa funkcji, która ma być wywołana w przypadku błędu\n
-            multiple_statements - więcej niż jedno polecenie SQL w wywołaniu funkcji
+            multiple_statements - więcej niż jedno polecenie SQL w wywołaniu funkcji\n
+            rollback_on_error - cofanie zmian w przypadku błędu\n
 
         Zwraca:
             int - wartość dodanych/zmienionych wierszy
@@ -164,7 +167,6 @@ class DatabaseTools():
                 cursor.execute(command)
                 database.commit()
             except mysql.connector.Error as err:
-                # TODO Wypełnić błędy
                 if debug:
                     print("Error Code:", err.errno)
                     print("SQLSTATE", err.sqlstate)
@@ -189,40 +191,26 @@ class DatabaseTools():
                 if on_fail != None:
                     on_fail.main(self)
 
-        if multiple_statements: # TODO Zrobić bardziej czytelne dla oka
-            """
-            Execute multiple SQL statements and returns the cursor from the last executed statement.
-
-            :param conn: The connection to the database
-            :type conn: Database connection
-
-            :param statements: The statements to be executed
-            :type statements: A list of strings
-
-            :param: rollback_on_error: Flag to indicate action to be taken on an exception
-            :type rollback_on_error: bool
-
-            :returns cursor from the last statement executed
-            :rtype cursor
-            """
-
+        if multiple_statements:
             try:
                 for statement in command:
                     cursor.execute(statement)
                     if not rollback_on_error:
-                        database.commit() # commit on each statement
+                        database.commit() # commit po każdym poleceniu by móc wycofać zmiany w przypadku błędu
+                        result += cursor.rowcount
             except Exception as e:
                 if rollback_on_error:
                     database.rollback()
+                    LoggingTools.log(self, f'Błąd podczas modyfikowania wierszy! \nZapytanie SQL: "{command}" \nZmodyfikowane wiersze: "{result}"', "error")
                 raise
             else:
                 if rollback_on_error:
-                    database.commit() # then commit only after all statements have completed successfully
-
-        result = cursor.rowcount
+                    database.commit()
+                    result += cursor.rowcount
+        else:
+            result = cursor.rowcount
+        
         if result == []:
-            # print("Wynik jest pusty. Sprawdź poprawność zapytania.")
-            # TODO Chyba zły pomysł
             result = False
 
         LoggingTools.log(self, f'Zapytanie SQL: "{command}" \nZmodyfikowane wiersze: "{result}"', "debug")

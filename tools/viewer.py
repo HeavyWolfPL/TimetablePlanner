@@ -25,6 +25,7 @@ class Viewer():
     2 - Nauczyciele
     3 - Przedmioty
     4 - Sale
+    X - Plan lekcji
     E - Wyjście z Przeglądu danych.
         
     Wybór: """)
@@ -32,19 +33,20 @@ class Viewer():
         if temp == "1":
             temp = input("Podaj klasę lub wychowawcę klasy, którą chcesz wyświetlić (lub pozostaw puste, aby wyświetlić wszystkie klasy): ")
             Viewer.show_classes(self, temp)
+            Viewer.main(self)
         elif temp == "2":
             temp = input("Podaj przedmiot, którego nauczycieli chcesz wyświetlić (lub pozostaw puste, aby wyświetlić wszystkich nauczycieli): ")
             Viewer.show_teachers(self, temp)
+            Viewer.main(self)
         elif temp == "3":
-            Viewer.show_subjects()
+            Viewer.show_subjects(self)
+            Viewer.main(self)
         elif temp == "4":
-            #TODO
-            #Viewer.show_rooms()
-            return
-        elif temp == "5":
-            #TODO
-            #Viewer.show_timetable()
-            return
+            Viewer.show_rooms(self)
+            Viewer.main(self)
+        # elif temp == "5":
+        #     #Viewer.show_timetable()
+        #     return
         elif temp.lower() in ["e", "exit", "q", "quit"]:
             exit()
             # Restart.rerun() #TODO ImportError: cannot import name 'Viewer' from partially initialized module 'tools.viewer' (most likely due to a circular import)
@@ -54,7 +56,7 @@ class Viewer():
         headers = ["Klasa", "Nauczyciel", "Sala", "Uczniowie"]
 
         if filtr.lstrip().rstrip():
-            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM klasy WHERE {filtr} IN (klasa, wychowawca)", Viewer)
+            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM klasy WHERE {filtr} IN (`klasa`, `wychowawca`)", Viewer)
         else:
             query = DatabaseTools.databaseQuery(self, "SELECT * FROM klasy", Viewer)
 
@@ -77,7 +79,6 @@ class Viewer():
         LoggingTools.log(self, f"Wyświetlono listę klas zgodnych z filtrowaniem: '{filtr}'")
 
         input("Naciśnij Enter, aby wrócić do menu głównego.")
-        Viewer.main(self)
 
     
     def show_teachers(self, filtr = None): 
@@ -85,7 +86,7 @@ class Viewer():
         headers = ["Imię i Nazwisko", "Przedmiot", "Wychowawstwo", "Godziny"]
 
         if filtr.lstrip().rstrip():
-            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM nauczyciele WHERE '{filtr}' in (IMIENAZWISKO, SKROT, PRZEDMIOT)", Viewer)
+            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM nauczyciele WHERE '{filtr}' in (`IMIENAZWISKO`, `SKROT`, `PRZEDMIOT`)", Viewer)
         else:
             query = DatabaseTools.databaseQuery(self, "SELECT * FROM nauczyciele", Viewer)
 
@@ -108,21 +109,17 @@ class Viewer():
         LoggingTools.log(self, f"Wyświetlono listę nauczycieli zgodnych z filtrowaniem: '{filtr}'")
 
         input("Naciśnij Enter, aby wrócić do menu głównego.")
-        Viewer.main(self)
 
-    def show_subjects(self, filtr = None):
+    def show_subjects(self):
         rows = []
         headers = ["Przedmiot", "Typ sali", "Przedmiot wychowawcy", "I Klasa / Godziny", "II Klasa / Godziny", "III Klasa / Godziny"]
 
-        if filtr.lstrip().rstrip():
-            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM przedmioty WHERE {filtr} in (Nazwa, godziny_klasa_1, godziny_klasa_2, godziny_klasa_3)", Viewer)
-        else:
-            query = DatabaseTools.databaseQuery(self, "SELECT * FROM przedmioty", Viewer)
+        query = DatabaseTools.databaseQuery(self, "SELECT * FROM przedmioty", Viewer)
 
         if not query:
-            print("Nie znaleziono klasy zgodnej z podanym filtrem.")
+            print("Nie znaleziono przedmiotów.")
             input("Naciśnij Enter, aby wrócić do menu głównego.")
-            LoggingTools.log(self, f"Nie znaleziono klasy zgodnej z podanym filtrem: '{filtr}'", "debug")
+            LoggingTools.log(self, f"Nie znaleziono przedmiotów.", "debug")
             Viewer.main(self)
         
         for subject in query:
@@ -137,10 +134,68 @@ class Viewer():
         table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
 
         print(table)
-        LoggingTools.log(self, f"Wyświetlono listę przedmiotów zgodnych z filtrowaniem: '{filtr}'")
+        LoggingTools.log(self, f"Wyświetlono listę przedmiotów.")
 
         input("Naciśnij Enter, aby wrócić do menu głównego.")
-        Viewer.main(self)
+
+    def show_rooms(self):
+        rows = []
+        headers = ["Sala", "Rodzaj", "Miejsca"]
+
+        query = DatabaseTools.databaseQuery(self, "SELECT * FROM sale", Viewer)
+
+        if not query:
+            print("Nie znaleziono sal.")
+            input("Naciśnij Enter, aby wrócić do menu głównego.")
+            LoggingTools.log(self, f"Nie znaleziono sal.", "debug")
+            Viewer.main(self)
+        
+        for classroom in query:
+            name = classroom[0]
+            classroom_type = classroom[1]
+            seats = classroom[2]
+            rows.append([name, classroom_type, seats])
+
+        table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
+
+        print(table)
+        LoggingTools.log(self, f"Wyświetlono listę sal.")
+
+        input("Naciśnij Enter, aby wrócić do menu głównego.")
+
+    def show_timetable(self, filtr = None):
+        rows = []
+        headers = ["Dzień", "Godzina", "Przedmiot", "Nauczyciel", "Sala"]
+
+        # ['1C', 1, '5', 'Edukacja wczesnoszkolna', 'AK']
+        # TODO Dokończyć
+
+        if filtr:
+            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM plan_lekcji WHERE {filtr.lstrip().rstrip()} IN `Klasa` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+        else:
+            query = DatabaseTools.databaseQuery(self, "SELECT * FROM `plan_lekcji` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+
+        if not query:
+            print("Nie znaleziono planu zgodnego z podanym filtrem.")
+            input("Naciśnij Enter, aby wrócić do menu głównego.")
+            LoggingTools.log(self, f"Nie znaleziono planu zgodnego z podanym filtrem: '{filtr}'", "debug")
+            Viewer.main(self)
+
+        for lesson in query:
+            day = lesson[0]
+            hour = lesson[1]
+            school_class = lesson[2]
+            subject = lesson[3]
+            teacher = lesson[4]
+            room = lesson[5]
+            rows.append([day, hour, school_class, subject, teacher, room])
+
+        table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
+
+        print(table)
+        LoggingTools.log(self, f"Wyświetlono plan zgodny z filtrowaniem: '{filtr}'")
+
+        input("Naciśnij Enter, aby wrócić do menu głównego.")
 
         
 

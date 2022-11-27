@@ -31,28 +31,19 @@ class Generator():
 
     1 - Przydzielenie nauczycieli do klas
     2 - Wygenerowanie planu lekcji dla klas(y)
-    3 - Obie powyższe opcje
     E(xit) - Wyjście z Przeglądu danych.
 
     Wybór: """)
 
         if temp == "1":
             Generator.assign_teachers(self)
+            Generator.main(self)
         elif temp == "2":
-            temp = input("Podaj przedmiot, którego nauczycieli chcesz wyświetlić (lub pozostaw puste, aby wyświetlić wszystkich nauczycieli): ")
-            Generator.generate_timetable(self, temp)
-        elif temp == "3":
-            Generator.assign_teachers(self)
-            day = input("Podaj dzień, dla którego chcesz wygenerować plan (lub pozostaw puste, aby wygenerować go dla całego tygodnia): ")
             school_class = input("Podaj klasę, dla której chcesz wygenerować plan (lub pozostaw puste, aby wygenerować go dla wszystkich): ")
-            Generator.generate_timetable(self)
+            Generator.generate_timetable(self, school_class)
+            Generator.main(self)
         elif temp.lower() in ["e", "exit", "q", "quit"]:
-            #TODO DatabaseTools.databaseClose(self)
             exit()
-            # Restart.rerun() #TODO: ImportError: cannot import name 'Generator' from partially initialized module 'tools.Generator' (most likely due to a circular import)
-
-    def assign_headteachers(self):
-        pass # N/A for 1-3 years of school
 
     def assign_teachers(self):
         query = DatabaseTools.databaseQuery(self, f"SELECT klasa FROM klasy", Generator)
@@ -148,6 +139,7 @@ class Generator():
                                 teachers_not_found.append(f"{klasa.name} | {przedmiot.name} | Wychowawca nie może zostać nauczycielem przedmiotu")
                             else:
                                 teachers_not_found.append(f"{klasa.name} | {przedmiot.name} | Brak nauczyciela przedmiotu")
+                yield
             else:
                 rows.append(["---------", "---------", "---------"] ) # Separating line between subjects
                 pass # Executes after the "for klasa in klasy" loop
@@ -160,21 +152,28 @@ class Generator():
             print(tabulate(rows, headers, tablefmt="orgtbl", stralign="center"))
         if teachers_not_found:
             print("Nie znaleziono nauczycieli dla klas: \n\t{}".format(', \n\t'.join(teachers_not_found)))
-        Generator.main(self)
 
-    def generate_timetable(self, day = None, school_class = None):
+    def generate_timetable(self, school_class = None):
+        with open("config.json", "r") as config: 
+            data = json.load(config)
+            debug = data["debug"]
+            del config
+
         print("Generowanie planu lekcji... \n")
 
         data = GeneratorTools.get_data(self, True, False)
-
         days = [[1, "Poniedzialek"], [2, "Wtorek"], [3, "Sroda"], [4, "Czwartek"], [5, "Piatek"]] # No polish chars due to them not being in the database as columns
 
-        # print(data)
-        # print()
+        if school_class.lstrip().rstrip() not in [None, ""]:
+            data.classes = [MiscTools.find(self, lambda Class: (Class.name == school_class), data.classes)]
+            if (data.classes == [None]) or (data.classes == []) or (data.classes[0] == None):
+                print(f"Nie znaleziono klasy {school_class}. Anuluję generowanie planu.")
+                LoggingTools.log(self, f"Nie znaleziono klasy {school_class}. Anulowano generowanie planu.", "error", _getframe().f_lineno)
+                return
         
+        shuffle(data.classes) # XXX Losowa kolejność klas?
         for school_class in data.classes:
             total_lessons = []
-            # TODO Losowa kolejność klas?
             lesson_hours = GeneratorTools.calculate_average_hours(self, data.subjects, school_class)
             if lesson_hours > len(data.lesson_hours):
                 print(f"Klasa {school_class.name} ma więcej godzin lekcyjnych niż przewiduje plan lekcji. Nie można wygenerować planu lekcji.")
@@ -238,8 +237,6 @@ class Generator():
             if len(subjects) != 0:
                 print(subjects) # TODO Add error logging here
 
-
-            #total_lessons.append(Timetable(
             total_lessons = Timetable(
                 assigned_class = school_class,
                 monday = days_lessons[0][1],
@@ -250,8 +247,9 @@ class Generator():
             )
             GeneratorTools.upload_timetable(self, total_lessons)
 
-            # with open(f"data/plany_lekcji/{school_class.name}.txt", "w", encoding="UTF-8") as file:
-            #     file.write(str(total_lessons))
+            if debug:
+                with open(f"data/plany_lekcji/{school_class.name}.txt", "w", encoding="UTF-8") as file:
+                    file.write(str(total_lessons))
 
         print("Zakończono generowanie planu lekcji.")
 

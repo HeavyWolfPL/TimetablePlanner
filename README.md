@@ -19,8 +19,12 @@
 <summary>Pakiety</summary>
 
 ```yml
-Placeholder
-Placeholder
+about-time==3.1.1
+alive-progress==2.4.1
+grapheme==0.6.0
+mysql-connector-python==8.0.31
+protobuf==3.20.1
+tabulate==0.9.0
 ```
 
 </details>

@@ -15,6 +15,7 @@ from tools.tools import DatabaseTools
 
 # Database Setup
 import json
+import os
 
 class Setup():
     def __init__(self):
@@ -50,6 +51,10 @@ class Setup():
         with open("data/SetupData.json", "r") as file:
             data = json.load(file)
             sql_commands = data["sql_commands"]
+
+        # if folder doesn't exist, then create it.
+        if not os.path.exists('data/plany_lekcji'):
+            os.makedirs('data/plany_lekcji')
 
         for cmd in sql_commands:
             print(f"Tworzenie tabelki {cmd}")

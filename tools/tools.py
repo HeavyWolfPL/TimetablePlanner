@@ -192,6 +192,7 @@ class DatabaseTools():
                     on_fail.main(self)
 
         if multiple_statements:
+            result = 0
             try:
                 for statement in command:
                     cursor.execute(statement)

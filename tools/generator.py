@@ -24,7 +24,6 @@ class Generator():
 
     def main(self):
         MiscTools.cls()
-        print("Generator work in progress")
 
         temp = input("""
     Wybierz element danych, który chcesz wygenerować:
@@ -58,12 +57,12 @@ class Generator():
         przedmioty = []
         for przedmiot in query:
             przedmioty.append(Subject(
-                name = przedmiot[0],
-                classroom_type = przedmiot[1],
-                teacher_preference = int(przedmiot[2]),
-                first_class_hr = int(przedmiot[3]),
-                second_class_hr = int(przedmiot[4]),
-                third_class_hr = int(przedmiot[5])
+                name = przedmiot[1],
+                classroom_type = przedmiot[2],
+                teacher_preference = int(przedmiot[3]),
+                first_class_hr = int(przedmiot[4]),
+                second_class_hr = int(przedmiot[5]),
+                third_class_hr = int(przedmiot[6])
             ))
 
         query = DatabaseTools.databaseQuery(self, f"SELECT * FROM `nauczyciele` ORDER BY `Skrot` ASC", Generator)
@@ -139,7 +138,7 @@ class Generator():
                                 teachers_not_found.append(f"{klasa.name} | {przedmiot.name} | Wychowawca nie może zostać nauczycielem przedmiotu")
                             else:
                                 teachers_not_found.append(f"{klasa.name} | {przedmiot.name} | Brak nauczyciela przedmiotu")
-                yield
+                # yield
             else:
                 rows.append(["---------", "---------", "---------"] ) # Separating line between subjects
                 pass # Executes after the "for klasa in klasy" loop
@@ -323,12 +322,12 @@ class GeneratorTools():
         if sql:
             for i, element in enumerate(sql):
                 sql[i] = Subject(
-                    name = element[0], 
-                    classroom_type = MiscTools.find(self, lambda ClassroomType: ClassroomType.name == element[1], data.classroom_types), 
-                    teacher_preference = element[2], 
-                    first_class_hr = element[3], 
-                    second_class_hr = element[4], 
-                    third_class_hr = element[5]
+                    name = element[1], 
+                    classroom_type = MiscTools.find(self, lambda ClassroomType: ClassroomType.name == element[2], data.classroom_types), 
+                    teacher_preference = element[3], 
+                    first_class_hr = element[4], 
+                    second_class_hr = element[5], 
+                    third_class_hr = element[6]
                 )
             data.subjects = sql
 

@@ -384,41 +384,6 @@ class GeneratorTools():
 
         return total
 
-    # def calculate_subject_hours(self, subject, school_class):
-    #     total_hours = GeneratorTools.calculate_hours(self, subject, school_class)
-    #     subjectHours = []
-
-    #     if total_hours % 3 == 0:
-    #         n = int(total_hours / 3)
-    #     elif total_hours % 2 == 0:
-    #         n = int(total_hours / 2)
-    #     else:
-    #         n = round(int(total_hours / 2))
-
-    #     if n <= 0:
-    #         n = 1
-
-    #     # if we cant split hours into parts
-    #     if(total_hours < n):
-    #         return [[subject, total_hours]]
-    #     elif ((total_hours % n) == 0):
-    #         for i in range(n):
-    #             subjectHours.append([subject, int(total_hours // n)])
-    #             #print(f"{total_hours // n} ")
-    #     else:
-    #         wieksze = n - (total_hours % n)
-    #         mniejsze = total_hours // n
-            
-    #         for i in range(n):
-    #             if(i >= wieksze):
-    #                 subjectHours.append([subject, mniejsze + 1])
-    #                 # print(f"{mniejsze + 1} ")
-    #             else:
-    #                 subjectHours.append([subject, mniejsze])
-    #                 #print(f"{mniejsze} ")
-
-    #     return subjectHours
-
     def calculate_subject_hours(self, subject, school_class):
         total_hours = GeneratorTools.calculate_hours(self, subject, school_class)
         subjectHours = []

@@ -437,7 +437,8 @@ class GeneratorTools():
             return True
         else:
             for lesson in lessons:
-                if lesson == classroom[1]:
+                lesson = lesson[0].lstrip().rstrip().split(", ")
+                if lesson[0] == classroom[0]:
                     return False
             return True
 

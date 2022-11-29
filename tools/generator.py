@@ -438,7 +438,7 @@ class GeneratorTools():
         else:
             for lesson in lessons:
                 lesson = lesson[0].lstrip().rstrip().split(", ")
-                if lesson[0] == classroom[0]:
+                if lesson[0][2:][:1] == classroom[0]: # cus lesson is returned as ['X', remove first 2 chars and last char
                     return False
             return True
 

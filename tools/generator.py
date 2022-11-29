@@ -419,7 +419,7 @@ class GeneratorTools():
             Bool (True/False) - dostępność nauczyciela
         """
 
-        lessons = DatabaseTools.databaseQuery(self, f"SELECT {day[1]} FROM `plan_lekcji` WHERE `GodzinaLekcyjna` = '{hour}' LIMIT 0, 50", Generator)
+        lessons = DatabaseTools.databaseQuery(self, f"SELECT {day[1]} FROM `plan_lekcji` WHERE `GodzinaLekcyjna` = '{hour}' LIMIT 0, 150", Generator)
         if not lessons:
             LoggingTools.log(self, f"[Generator Tools | teacher_availability] Nie zwrocono żadnych danych o zajęciach na godzinę {hour} dnia {day}.", "info", _getframe().f_lineno)
             return True
@@ -431,7 +431,7 @@ class GeneratorTools():
             return True
 
     def classroom_availability(self, classroom, day, hour):
-        lessons = DatabaseTools.databaseQuery(self, f"SELECT {day[1]} FROM `plan_lekcji` WHERE `GodzinaLekcyjna` = '{hour}' LIMIT 0, 50", Generator)
+        lessons = DatabaseTools.databaseQuery(self, f"SELECT {day[1]} FROM `plan_lekcji` WHERE `GodzinaLekcyjna` = '{hour}' LIMIT 0, 150", Generator)
         if not lessons:
             LoggingTools.log(self, f"[Generator Tools | classroom_availability] Nie zwrocono żadnych danych o zajęciach na godzinę {hour} dnia {day}.", "info", _getframe().f_lineno)
             return True

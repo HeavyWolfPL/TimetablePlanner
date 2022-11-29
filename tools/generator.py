@@ -426,7 +426,7 @@ class GeneratorTools():
         else:
             for lesson in lessons:
                 lesson = lesson[0].lstrip().rstrip().split(", ")
-                if lesson[4] == teacher.short_name:
+                if lesson[2] == teacher.short_name:
                     return False
             return True
 
@@ -473,10 +473,9 @@ class GeneratorTools():
         for i, hour in enumerate(lessonsHours):
             lessons = []
             for lesson in hour:
-                lessons.append([lesson.assigned_class, lesson.hour, lesson.classroom[0], lesson.subject, lesson.teacher])
+                lessons.append([lesson.classroom[0], lesson.subject, lesson.teacher])
+                # lessons.append([lesson.assigned_class, lesson.hour, lesson.classroom[0], lesson.subject, lesson.teacher])
             lessonsHours[i] = lessons
-
-        json_data = json.dumps(lessonsHours, indent=4)
 
         sql = []
         for i, hour in enumerate(lessonsHours, 1):

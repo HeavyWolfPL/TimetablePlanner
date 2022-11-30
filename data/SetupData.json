@@ -1,0 +1,99 @@
+{
+    "sql_commands": {
+        "godziny_lekcyjne": "CREATE TABLE `godziny_lekcyjne` (`lp` int(11) NOT NULL, `Poczatek` varchar(5) NOT NULL, `Koniec` varchar(5) NOT NULL, PRIMARY KEY (`lp`), UNIQUE KEY `lp` (`lp`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "sale_rodzaje": "CREATE TABLE `sale_rodzaje` (`Rodzaj` varchar(255) NOT NULL, PRIMARY KEY (`Rodzaj`), KEY `Rodzaj` (`Rodzaj`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "sale": "CREATE TABLE `sale` (`Sala` varchar(255) NOT NULL, `Rodzaj` varchar(255) NOT NULL, `Miejsca` int(11) NOT NULL, PRIMARY KEY (`Sala`), KEY `rodzaj_sali` (`Rodzaj`), CONSTRAINT `rodzaj_sali` FOREIGN KEY (`Rodzaj`) REFERENCES `sale_rodzaje` (`Rodzaj`) ON DELETE NO ACTION ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "przedmioty": "CREATE TABLE `przedmioty` (`lp` int(11) NOT NULL AUTO_INCREMENT, `Nazwa` varchar(255) NOT NULL, `RodzajSali` varchar(255) NOT NULL, `PrzedmiotWychowawcy` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0 - Dowolny nauczyciel przedmiotu\r\n1 - Wychowawca', `godziny_klasa_1` int(11) NOT NULL, `godziny_klasa_2` int(11) NOT NULL, `godziny_klasa_3` int(11) NOT NULL, PRIMARY KEY (`Nazwa`), UNIQUE KEY `lp` (`lp`), KEY `RodzajSali` (`RodzajSali`), CONSTRAINT `rodzaje_sal` FOREIGN KEY (`RodzajSali`) REFERENCES `sale_rodzaje` (`Rodzaj`) ON DELETE NO ACTION ON UPDATE CASCADE) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4",
+        "nauczyciele": "CREATE TABLE `nauczyciele` ( `Skrot` varchar(3) NOT NULL, `ImieNazwisko` varchar(255) NOT NULL, `Przedmiot` varchar(255) NOT NULL, `Wychowawstwo` tinyint(1) NOT NULL DEFAULT 0 COMMENT ' 0 - Brak wychowawstwa\r\n1 - Wychowawca lub mozliwosc bycia wychowawca', `Godziny` int(2) NOT NULL DEFAULT 0, PRIMARY KEY (`Skrot`), UNIQUE KEY `Skrot` (`Skrot`), KEY `Przedmiot` (`Przedmiot`), KEY `ImieNazwisko` (`ImieNazwisko`), CONSTRAINT `nauczyciele_ibfk_1` FOREIGN KEY (`Przedmiot`) REFERENCES `przedmioty` (`Nazwa`)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "klasy": "CREATE TABLE `klasy` (`Klasa` varchar(10) NOT NULL, `Osoby` int(11) NOT NULL, `Wychowawca` varchar(255) NOT NULL, `Sala` varchar(255) NOT NULL, PRIMARY KEY (`Klasa`), KEY `Wychowawca` (`Wychowawca`), KEY `Sala` (`Sala`), CONSTRAINT `klasy_ibfk_1` FOREIGN KEY (`Wychowawca`) REFERENCES `nauczyciele` (`ImieNazwisko`) ON UPDATE CASCADE, CONSTRAINT `klasy_ibfk_2` FOREIGN KEY (`Sala`) REFERENCES `sale` (`Sala`) ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4",
+        "przydzieleni_nauczyciele": "CREATE TABLE `przydzieleni_nauczyciele` (`Lp` int(11) NOT NULL AUTO_INCREMENT, `Przedmiot` varchar(255) NOT NULL, `Nauczyciel` varchar(255) NOT NULL, `Klasa` varchar(255) NOT NULL, PRIMARY KEY (`Lp`), KEY `przedmioty` (`Przedmiot`), KEY `nauczyciele` (`Nauczyciel`), KEY `klasy` (`Klasa`) USING BTREE, CONSTRAINT `klasy` FOREIGN KEY (`Klasa`) REFERENCES `klasy` (`Klasa`) ON UPDATE CASCADE, CONSTRAINT `nauczyciele` FOREIGN KEY (`Nauczyciel`) REFERENCES `nauczyciele` (`ImieNazwisko`) ON UPDATE CASCADE, CONSTRAINT `przedmioty` FOREIGN KEY (`Przedmiot`) REFERENCES `przedmioty` (`Nazwa`) ON UPDATE CASCADE) ENGINE=InnoDB AUTO_INCREMENT=478 DEFAULT CHARSET=utf8mb4",
+        "plan_lekcji": "CREATE TABLE `plan_lekcji` (`lp` int(11) NOT NULL AUTO_INCREMENT, `Klasa` varchar(10) NOT NULL, `GodzinaLekcyjna` int(2) NOT NULL, `Poniedzialek` text DEFAULT NULL, `Wtorek` text DEFAULT NULL, `Sroda` text DEFAULT NULL, `Czwartek` text DEFAULT NULL, `Piatek` text DEFAULT NULL, PRIMARY KEY (`lp`), KEY `Klasa` (`Klasa`), KEY `GodzinaLekcyjna` (`GodzinaLekcyjna`), CONSTRAINT `plan_lekcji_ibfk_1` FOREIGN KEY (`Klasa`) REFERENCES `klasy` (`Klasa`) ON DELETE CASCADE ON UPDATE CASCADE, CONSTRAINT `plan_lekcji_ibfk_2` FOREIGN KEY (`GodzinaLekcyjna`) REFERENCES `godziny_lekcyjne` (`lp`) ON DELETE CASCADE ON UPDATE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+    },
+    "placeholder_data": {
+        "godziny_lekcyjne": [
+            {"lp": "1", "Poczatek": "8:00", "Koniec": "8:45"},
+            {"lp": "2", "Poczatek": "8:50", "Koniec": "9:35"},
+            {"lp": "3", "Poczatek": "9:45", "Koniec": "10:30"},
+            {"lp": "4", "Poczatek": "10:45", "Koniec": "11:30"},
+            {"lp": "5", "Poczatek": "11:35", "Koniec": "12:20"},
+            {"lp": "6", "Poczatek": "12:25", "Koniec": "13:10"},
+            {"lp": "7", "Poczatek": "13:20", "Koniec": "14:05"},
+            {"lp": "8", "Poczatek": "14:10", "Koniec": "14:55"},
+            {"lp": "9", "Poczatek": "15:00", "Koniec": "15:45"},
+            {"lp": "10", "Poczatek": "15:50", "Koniec": "16:35"},
+            {"lp": "11", "Poczatek": "16:40", "Koniec": "17:25"},
+            {"lp": "12", "Poczatek": "17:30", "Koniec": "18:15"}
+        ],
+        "sale_rodzaje": [
+            {"Rodzaj": "Biologiczna"},
+            {"Rodzaj": "Chemiczna"},
+            {"Rodzaj": "Fizyczna"},
+            {"Rodzaj": "Informatyczna"},
+            {"Rodzaj": "Językowa"},
+            {"Rodzaj": "Uniwersalna"},
+            {"Rodzaj": "Wychowanie-Fizyczne"}
+        ],
+        "sale": [
+            {"Sala": "1", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "10", "Rodzaj": "Uniwersalna", "Miejsca": "25"},
+            {"Sala": "11", "Rodzaj": "Uniwersalna", "Miejsca": "28"},
+            {"Sala": "12", "Rodzaj": "Uniwersalna", "Miejsca": "24"},
+            {"Sala": "2", "Rodzaj": "Uniwersalna", "Miejsca": "25"},
+            {"Sala": "3", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "4", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "5", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "6", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "7", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "8", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "9", "Rodzaj": "Uniwersalna", "Miejsca": "30"},
+            {"Sala": "A1", "Rodzaj": "Językowa", "Miejsca": "15"},
+            {"Sala": "A2", "Rodzaj": "Językowa", "Miejsca": "15"},
+            {"Sala": "I1", "Rodzaj": "Informatyczna", "Miejsca": "15"},
+            {"Sala": "SG1", "Rodzaj": "Wychowanie-Fizyczne", "Miejsca": "15"},
+            {"Sala": "SG2", "Rodzaj": "Wychowanie-Fizyczne", "Miejsca": "15"}
+        ],
+        "przedmioty": [
+            {"Nazwa": "Edukacja wczesnoszkolna", "RodzajSali": "Uniwersalna", "PrzedmiotWychowawcy": "1", "godziny_klasa_1": "16", "godziny_klasa_2": "16", "godziny_klasa_3": "16"},
+            {"Nazwa": "Informatyka", "RodzajSali": "Informatyczna", "PrzedmiotWychowawcy": "0", "godziny_klasa_1": "1", "godziny_klasa_2": "1", "godziny_klasa_3": "1"},
+            {"Nazwa": "Język Angielski", "RodzajSali": "Językowa", "PrzedmiotWychowawcy": "0", "godziny_klasa_1": "2", "godziny_klasa_2": "2", "godziny_klasa_3": "2"},
+            {"Nazwa": "Religia", "RodzajSali": "Uniwersalna", "PrzedmiotWychowawcy": "0", "godziny_klasa_1": "2", "godziny_klasa_2": "2", "godziny_klasa_3": "2"},
+            {"Nazwa": "Wychowanie Fizyczne", "RodzajSali": "Wychowanie-Fizyczne", "PrzedmiotWychowawcy": "0", "godziny_klasa_1": "3", "godziny_klasa_2": "3", "godziny_klasa_3": "3"}
+        ],
+        "nauczyciele": [
+            {"Skrot":"AJ","ImieNazwisko":"Adrian Jankowski","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"AK","ImieNazwisko":"Antonin Kostka","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"AM","ImieNazwisko":"Aneta Mróz","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"AS","ImieNazwisko":"Aniela Smolka","Przedmiot":"Język Angielski","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"BB","ImieNazwisko":"Bogumir Banach","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"BM","ImieNazwisko":"Bronisław Macierowski","Przedmiot":"Język Angielski","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"BW","ImieNazwisko":"Błażej Walczak","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"DB","ImieNazwisko":"Dorian Błaszczyk","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"DP","ImieNazwisko":"Daniel Piotrowski","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"IB","ImieNazwisko":"Igor Brzeziński","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"KG","ImieNazwisko":"Kacper Gac","Przedmiot":"Religia","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"MG","ImieNazwisko":"Magda Górska","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"MI","ImieNazwisko":"Milan Rutkowski","Przedmiot":"Informatyka","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"MK","ImieNazwisko":"Marcin Kowalski","Przedmiot":"Religia","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"MR","ImieNazwisko":"Marzena Rudas","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"OK","ImieNazwisko":"Oliwia Krajewska","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"PC","ImieNazwisko":"Paulina Cukierman","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"PG","ImieNazwisko":"Pamela Gieldud","Przedmiot":"Edukacja wczesnoszkolna","Wychowawstwo":"1","Godziny":"0"},
+            {"Skrot":"ST","ImieNazwisko":"Sebastian Taber","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"},
+            {"Skrot":"RL","ImieNazwisko":"Robert Laik","Przedmiot":"Wychowanie Fizyczne","Wychowawstwo":"0","Godziny":"0"}
+        ],
+        "klasy": [
+            {"Klasa": "1A", "Osoby": "30", "Wychowawca": "Paulina Cukierman", "Sala": "1"},
+            {"Klasa": "1B", "Osoby": "25", "Wychowawca": "Marzena Rudas", "Sala": "2"},
+            {"Klasa": "1C", "Osoby": "20", "Wychowawca": "Antonin Kostka", "Sala": "3"},
+            {"Klasa": "1D", "Osoby": "30", "Wychowawca": "Pamela Gieldud", "Sala": "4"},
+            {"Klasa": "2A", "Osoby": "24", "Wychowawca": "Dorian Błaszczyk", "Sala": "5"},
+            {"Klasa": "2B", "Osoby": "25", "Wychowawca": "Oliwia Krajewska", "Sala": "6"},
+            {"Klasa": "2C", "Osoby": "25", "Wychowawca": "Aneta Mróz", "Sala": "7"},
+            {"Klasa": "2D", "Osoby": "30", "Wychowawca": "Daniel Piotrowski", "Sala": "8"},
+            {"Klasa": "3A", "Osoby": "24", "Wychowawca": "Igor Brzeziński", "Sala": "9"},
+            {"Klasa": "3B", "Osoby": "28", "Wychowawca": "Magda Górska", "Sala": "10"},
+            {"Klasa": "3C", "Osoby": "27", "Wychowawca": "Błażej Walczak", "Sala": "11"},
+            {"Klasa": "3D", "Osoby": "25", "Wychowawca": "Adrian Jankowski", "Sala": "12"}
+        ]
+    }
+}

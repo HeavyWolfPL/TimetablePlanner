@@ -1,0 +1,24 @@
+{
+    "_Separator1_": 	"---------------------------",
+	"_MainSettings_": 	"-------Main Settings-------",
+	"_Separator2_": 	"---------------------------",
+    
+	"debug": false,
+	"log_cleanup_mode": "number",
+	"log_cleanup_amount": 5,
+
+
+	"_Separator3_": 	"---------------------------",
+	"_DziennikConfig_": "-----Database Settings-----",
+	"_Separator4_": 	"---------------------------",
+
+	"db_ip": "IP_GOES_HERE",
+	"db_user": "USER_GOES_HERE",
+	"db_pass": "PASSWORD_GOES_HERE",
+	"db_database": "timetable_planner",
+
+	
+	"_Separator98_": 	"---------------------------",
+	"_Wafel_": 			"-------Wafelowski.pl-------",
+	"_Separator99_": 	"---------------------------"
+}

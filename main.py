@@ -1,69 +1,106 @@
-# from bs4 import BeautifulSoup
-import dataclasses
+# Main Tools
+from tools.setup import Setup
+from tools.generator import Generator
+from tools.editor import Editor
+from tools.viewer import Viewer
+
+# Misc Tools
+from tools.tools import LoggingTools
+from tools.tools import MiscTools
+
+class Program():
+    def __init__(self):
+        self.self = self
+
+    def main_menu(self):
+        MiscTools.cls()
+
+        print("""
+        __________                 _        _     _      _____  _                             
+        |__   __(_)               | |      | |   | |    |  __ \| |                            
+            | |   _ _ __ ___   ___| |_ __ _| |__ | | ___| |__) | | __ _ _ __  _ __   ___ _ __ 
+            | |  | | '_ ` _ \ / _ \ __/ _` | '_ \| |/ _ \  ___/| |/ _` | '_ \| '_ \ / _ \ '__|
+            | |  | | | | | | |  __/ || (_| | |_) | |  __/ |    | | (_| | | | | | | |  __/ |   
+            |_|  |_|_| |_| |_|\___|\__\__,_|_.__/|_|\___|_|    |_|\__,_|_| |_|_| |_|\___|_|   
+        
+        
+        Work in Progress - v0.1
+        """)
+        
+        temp = ""
+        while temp.lower() not in ["0", "1", "2", "3", "e", "exit", "4"]:
+            temp = input("""
+    Wybierz tryb działania programu, wpisz odpowiedni znak i zatwierdź klawiszem Enter. 
+
+    0 - Konfigurator danych
+    1 - Generator
+    2 - Edytor Danych
+    3 - Przegląd danych
+    4 - Funkcja testowa
+    E(xit) - Wyjście z programu.
+        
+    Wybór: """)
+
+        if temp == "0":
+            Setup.main(self)
+        elif temp == "1":
+            Generator.main(self)
+        elif temp == "2":
+            Editor.main(self)
+        elif temp == "3":
+            Viewer.main(self)
+        elif temp == "4":
+            Testing.test(self)
+        elif temp.lower() in ["e", "exit", "q", "quit"]:
+            exit()
+
+
+### Testing ###
+from tools.tools import DatabaseTools
+from tools.generator import GeneratorTools
 import json
-from data.dataclasses import Flags, LessonHour, Classroom, Subject, Teacher, Class, Lesson, Timetable 
+from alive_progress import alive_bar
+import time
+class Testing():
+    def __init__(self):
+        self.self = self
+
+    def main(self):
+        print("Funkcja testowa")
+
+    def compute():
+        for i in range(100):
+            time.sleep(0.05)
+            yield
+
+    def test(self):
+        # result = DatabaseTools.databaseModify(self, "INSERT INTO `przydzieleni_nauczyciele` (`Przedmiot`, `Nauczyciel`, `Klasa`) VALUES ('Edukacja wczesnoszkolna', 'Pamela Gieldud', '1D')", Testing)
+        with alive_bar(100) as bar: # TODO: https://github.com/rsalmei/alive-progress
+            for i in Testing.compute():
+                bar()
+        Testing.compute()
+        print("Koniec funkcji testowej")
+### Testing ###
 
 
-def FlagsExample():
-    data = Flags()
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Flags.json', 'w') as f:
-        f.write(data)
-FlagsExample()
 
-def LessonHourExample():
-    data = LessonHour("8:00", "8:45", [Flags(early=True)])
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/LessonHour.json', 'w') as f:
-        f.write(data)
-LessonHourExample()
+class Restart():
+    def __init__(self):
+        self.self = self
 
-def ClassroomExample():
-    data = Classroom(name="1", type="normal", max_students=30)
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Classroom.json', 'w') as f:
-        f.write(data)
-ClassroomExample()
+    def rerun():
+        App = Program()
+        App.main_menu()
 
-def SubjectExample():
-    data = Subject(name="Math", groups=False, classroom_type="normal")
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Subject.json', 'w') as f:
-        f.write(data)
-SubjectExample()
 
-def TeacherExample():
-    data = Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")])
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Teacher.json', 'w') as f:
-        f.write(data)
-TeacherExample()
+## 
 
-def ClassExample():
-    data = Class(name="1TI1", students=30, subjects=[Subject(name="Math", groups=False, classroom_type="normal")], teachers=[Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")])], hour_flags=[Flags(early=True)], classroom="1")
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Class.json', 'w') as f:
-        f.write(data)
-ClassExample()
+if __name__ == "__main__":
+    LoggingTools.initialize_logging()
+    LoggingTools.cleanup()
+    App = Program()
+    App.main_menu()
 
-def LessonExample():
-    data = Lesson(hour=LessonHour("8:00", "8:45", [Flags(early=True)]), classroom=Classroom(name="1", type="normal", max_students=30), subject=Subject(name="Math", groups=False, classroom_type="normal"), teacher=Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")]), class_=Class(name="1TI1", students=30, subjects=[Subject(name="Math", groups=False, classroom_type="normal")], teachers=[Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")])], hour_flags=[Flags(early=True)], classroom="1"))
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Lesson.json', 'w') as f:
-        f.write(data)
-LessonExample()
-
-def TimetableExample():
-    data = Timetable(class_=Class(name="1TI1", students=30, subjects=[Subject(name="Math", groups=False, classroom_type="normal")], teachers=[Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")])], hour_flags=[Flags(early=True)], classroom="1"), monday=[Lesson(hour=LessonHour("8:00", "8:45", [Flags(early=True)]), classroom=Classroom(name="1", type="normal", max_students=30), subject=Subject(name="Math", groups=False, classroom_type="normal"), teacher=Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")]), class_=Class(name="1TI1", students=30, subjects=[Subject(name="Math", groups=False, classroom_type="normal")], teachers=[Teacher(name="John Doe", subjects=[Subject(name="Math", groups=False, classroom_type="normal")])], hour_flags=[Flags(early=True)], classroom="1"))], tuesday=[], wednesday=[], thursday=[], friday=[])
-    print(data)
-    data = json.dumps(dataclasses.asdict(data), indent=4)
-    with open('data/examples/Timetable.json', 'w') as f:
-        f.write(data)
-TimetableExample()
+# TODO On Exit
+# import atexit
+# atexit.register(print, 'goodbye.')

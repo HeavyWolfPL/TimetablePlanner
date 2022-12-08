@@ -1,7 +1,6 @@
 # Main Tools
 from tools.setup import Setup
 from tools.generator import Generator
-from tools.editor import Editor
 from tools.viewer import Viewer
 
 # Misc Tools
@@ -34,9 +33,7 @@ class Program():
 
     0 - Konfigurator danych
     1 - Generator
-    2 - Edytor Danych
-    3 - Przegląd danych
-    4 - Funkcja testowa
+    2 - Przegląd danych
     E(xit) - Wyjście z programu.
         
     Wybór: """)
@@ -46,10 +43,8 @@ class Program():
         elif temp == "1":
             Generator.main(self)
         elif temp == "2":
-            Editor.main(self)
-        elif temp == "3":
             Viewer.main(self)
-        elif temp == "4":
+        elif temp == "3":
             Testing.test(self)
         elif temp.lower() in ["e", "exit", "q", "quit"]:
             exit()

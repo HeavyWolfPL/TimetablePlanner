@@ -11,6 +11,9 @@ from tools.tools import DatabaseTools
 import mysql.connector
 from mysql.connector import errorcode
 
+# Dataclasses
+from data.dataclasses import LessonHour
+
 class Viewer():
     def __init__(self):
         self.self = self
@@ -25,7 +28,7 @@ class Viewer():
     2 - Nauczyciele
     3 - Przedmioty
     4 - Sale
-    X - Plan lekcji
+    5 - Plan lekcji 
     E - Wyjście z Przeglądu danych.
         
     Wybór: """)
@@ -44,9 +47,9 @@ class Viewer():
         elif temp == "4":
             Viewer.show_rooms(self)
             Viewer.main(self)
-        # elif temp == "5":
-        #     #Viewer.show_timetable()
-        #     return
+        elif temp == "5":
+            Viewer.show_timetable(self)
+            return
         elif temp.lower() in ["e", "exit", "q", "quit"]:
             exit()
             # Restart.rerun() #TODO ImportError: cannot import name 'Viewer' from partially initialized module 'tools.viewer' (most likely due to a circular import)
@@ -164,35 +167,72 @@ class Viewer():
         input("Naciśnij Enter, aby wrócić do menu głównego.")
 
     def show_timetable(self, filtr = None):
-        rows = []
-        headers = ["Dzień", "Godzina", "Przedmiot", "Nauczyciel", "Sala"]
+        timetables = []
+        headers = ["Godz.", "Poniedziałek", "Wtorek", "Środa", "Czwartek", "Piątek"]
 
-        # ['1C', 1, '5', 'Edukacja wczesnoszkolna', 'AK']
-        # TODO Dokończyć
+        lesson_hours = DatabaseTools.databaseQuery(self, "SELECT * FROM godziny_lekcyjne", Viewer)
+        temp = []
+        for lesson_hour in lesson_hours:
+            temp.append(
+                LessonHour(
+                    lp = f"{lesson_hour[0]}", 
+                    start = f"{lesson_hour[1]}", 
+                    end = f"{lesson_hour[2]}"
+                ))
+
+        lesson_hours = temp
+        del temp
 
         if filtr:
-            query = DatabaseTools.databaseQuery(self, f"SELECT * FROM plan_lekcji WHERE {filtr.lstrip().rstrip()} IN `Klasa` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+            query = DatabaseTools.databaseQuery(self, f"SELECT `Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek` FROM `plan_lekcji` WHERE {filtr.lstrip().rstrip()} IN `Klasa` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+            if not query:
+                print("Nie znaleziono planu zgodnego z podanym filtrem.")
+                input("Naciśnij Enter, aby wrócić do menu głównego.")
+                LoggingTools.log(self, f"Nie znaleziono planu zgodnego z podanym filtrem: '{filtr}'", "debug")
+                Viewer.main(self)
         else:
-            query = DatabaseTools.databaseQuery(self, "SELECT * FROM `plan_lekcji` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+            classes = DatabaseTools.databaseQuery(self, "SELECT DISTINCT `Klasa` FROM `plan_lekcji` ORDER BY `plan_lekcji`.`Klasa` ASC", Viewer)
+            if not classes:
+                print("Nie znaleziono klas zgodnych z podanym filtrem.")
+                input("Naciśnij Enter, aby wrócić do menu głównego.")
+                LoggingTools.log(self, f"Nie znaleziono planu zgodnego z podanym filtrem: '{filtr}'", "debug")
+                Viewer.main(self)
 
-        if not query:
-            print("Nie znaleziono planu zgodnego z podanym filtrem.")
-            input("Naciśnij Enter, aby wrócić do menu głównego.")
-            LoggingTools.log(self, f"Nie znaleziono planu zgodnego z podanym filtrem: '{filtr}'", "debug")
-            Viewer.main(self)
+            for school_class in classes:
+                rows = []
+                school_class = school_class[0]
+                query = DatabaseTools.databaseQuery(self, f"SELECT `Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek` FROM `plan_lekcji` WHERE `Klasa` = '{school_class}' ORDER BY `Klasa` ASC, `GodzinaLekcyjna` ASC", Viewer)
+                if not query:
+                    print("Nie znaleziono planu zgodnego z podanym filtrem.")
+                    input("Naciśnij Enter, aby wrócić do menu głównego.")
+                    LoggingTools.log(self, f"Nie znaleziono planu zgodnego z podanym filtrem: '{filtr}'", "debug")
+                    Viewer.main(self)
 
-        for lesson in query:
-            day = lesson[0]
-            hour = lesson[1]
-            school_class = lesson[2]
-            subject = lesson[3]
-            teacher = lesson[4]
-            room = lesson[5]
-            rows.append([day, hour, school_class, subject, teacher, room])
+                for lesson in query:
+                    data = []
+                    for i, lesson_data in enumerate(lesson):
+                        if (i >= 2) and (i <= 6):
+                            lesson_data = str(lesson_data).replace("[", "").replace("]", "").replace("'", "").split(", ")
+                            if len(lesson_data) == 1:
+                                data.append("")
+                            else:
+                                data.append(f"{lesson_data[1]} ({lesson_data[2]} | {lesson_data[0]})")
+                        else:
+                            continue
+                
+                    lessonhour = MiscTools.find(self, lambda LessonHour: str(LessonHour.lp) == str(lesson[1]), lesson_hours)
+                    lessonhour = f"{lessonhour.start} - {lessonhour.end}"
+                    rows.append([lessonhour, data[0], data[1], data[2], data[3], data[4]])
 
-        table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
+                table = tabulate(rows, headers, tablefmt="orgtbl", stralign="center")
+                timetables.append([school_class, table])
+            
 
-        print(table)
+        for timetable in timetables:
+            print()
+            print(f"Plan lekcji dla klasy {timetable[0]}")
+            print(timetable[1])
+            print()
         LoggingTools.log(self, f"Wyświetlono plan zgodny z filtrowaniem: '{filtr}'")
 
         input("Naciśnij Enter, aby wrócić do menu głównego.")

@@ -371,31 +371,33 @@ class GeneratorTools():
                 data.assigned_teachers = sql
 
         if timetable:
-            sql = DatabaseTools.databaseQuery(self, "SELECT `Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek` FROM `plan_lekcji` ORDER BY `Klasa` ASC, `GodzinaLekcyjna` ASC")
-            if sql:
-                for i, element in enumerate(sql):
-                    sql[i] = list(element)
-                    element = sql[i]
-                    for ii, lesson_data in enumerate(element): # TODO Do not use SQL as variable here, make a new query !!!
-                        if (ii >= 2) and (ii <= 6):
-                            if lesson_data != ['']:
-                                continue
-                            lesson_data = str(lesson_data).replace("[", "").replace("]", "").replace("'", "").split(", ")
-                            classroom = MiscTools.find(self, lambda Classroom: Classroom.name == lesson_data[0], data.classrooms)
-                            teacher = MiscTools.find(self, lambda Teacher: Teacher.name == lesson_data[2], data.teachers)
-                            subject = MiscTools.find(self, lambda Subject: Subject.name == lesson_data[1], data.subjects)
-                            element[ii] = [classroom, teacher, subject]
+            data.timetable = []
+            # TODO: Add timetable data for get_data()
+            # sql = DatabaseTools.databaseQuery(self, "SELECT `Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek` FROM `plan_lekcji` ORDER BY `Klasa` ASC, `GodzinaLekcyjna` ASC")
+            # if sql:
+            #     for i, element in enumerate(sql):
+            #         sql[i] = list(element)
+            #         element = sql[i]
+            #         for ii, lesson_data in enumerate(element): # TODO Do not use SQL as variable here, make a new query !!!
+            #             if (ii >= 2) and (ii <= 6):
+            #                 if lesson_data != ['']:
+            #                     continue
+            #                 lesson_data = str(lesson_data).replace("[", "").replace("]", "").replace("'", "").split(", ")
+            #                 classroom = MiscTools.find(self, lambda Classroom: Classroom.name == lesson_data[0], data.classrooms)
+            #                 teacher = MiscTools.find(self, lambda Teacher: Teacher.name == lesson_data[2], data.teachers)
+            #                 subject = MiscTools.find(self, lambda Subject: Subject.name == lesson_data[1], data.subjects)
+            #                 element[ii] = [classroom, subject, teacher]
 
-                    sql[i] = Timetable(
-                        assigned_class = MiscTools.find(self, lambda ClassTeam: ClassTeam.name == element[0], data.classes),
-                        lesson_hour = MiscTools.find(self, lambda LessonHour: LessonHour.lp == element[1], data.lesson_hours),
-                        monday = element[2],
-                        tuesday = element[3],
-                        wednesday = element[4],
-                        thursday = element[5],
-                        friday = element[6]
-                    )
-                data.timetables = sql
+            #         sql[i] = Timetable(
+            #             assigned_class = MiscTools.find(self, lambda ClassTeam: ClassTeam.name == element[0], data.classes),
+            #             lesson_hour = MiscTools.find(self, lambda LessonHour: LessonHour.lp == element[1], data.lesson_hours),
+            #             monday = element[2],
+            #             tuesday = element[3],
+            #             wednesday = element[4],
+            #             thursday = element[5],
+            #             friday = element[6]
+            #         )
+            #     data.timetables = sql
 
         return data
 

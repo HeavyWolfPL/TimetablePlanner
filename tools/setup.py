@@ -43,7 +43,6 @@ class Setup():
             Setup.database_setup(self)
             Setup.data_setup(self)
         elif temp.lower() in ["e", "exit", "q", "quit"]:
-            #TODO DatabaseTools.databaseClose(self)
             exit()
             # Restart.rerun() #TODO ImportError: cannot import name 'Generator' from partially initialized module 'tools.Generator' (most likely due to a circular import)
 

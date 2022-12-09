@@ -164,13 +164,13 @@ class Generator():
         days = [[1, "Poniedzialek"], [2, "Wtorek"], [3, "Sroda"], [4, "Czwartek"], [5, "Piatek"]] # No polish chars due to them not being in the database as columns
 
         if school_class.lstrip().rstrip() not in [None, ""]:
-            data.classes = [MiscTools.find(self, lambda Class: (Class.name == school_class), data.classes)]
+            data.classes = [MiscTools.find(self, lambda ClassTeam: (ClassTeam.name == school_class), data.classes)]
             if (data.classes == [None]) or (data.classes == []) or (data.classes[0] == None):
                 print(f"Nie znaleziono klasy {school_class}. Anuluję generowanie planu.")
                 LoggingTools.log(self, f"Nie znaleziono klasy {school_class}. Anulowano generowanie planu.", "error", _getframe().f_lineno)
                 return
         
-        shuffle(data.classes) # XXX Losowa kolejność klas?
+        shuffle(data.classes)
         for school_class in data.classes:
             total_lessons = []
             lesson_hours = GeneratorTools.calculate_average_hours(self, data.subjects, school_class)
@@ -234,7 +234,9 @@ class Generator():
                 subjects.remove(None)
 
             if len(subjects) != 0:
-                print(subjects) # TODO Add error logging here
+                LoggingTools.log(self, "Nie udało się przypisać wszystkich przedmiotów do planu lekcji. Taka sytuacja nie powinna wystąpić.", "error", _getframe().f_lineno)
+                print("Nie udało się przypisać wszystkich przedmiotów do planu lekcji. Taka sytuacja nie powinna wystąpić.")
+                return
 
             total_lessons = Timetable(
                 assigned_class = school_class,
@@ -369,8 +371,31 @@ class GeneratorTools():
                 data.assigned_teachers = sql
 
         if timetable:
-            data.timetables = []
-            # TODO DataPack.timetables     
+            sql = DatabaseTools.databaseQuery(self, "SELECT `Klasa`, `GodzinaLekcyjna`, `Poniedzialek`, `Wtorek`, `Sroda`, `Czwartek`, `Piatek` FROM `plan_lekcji` ORDER BY `Klasa` ASC, `GodzinaLekcyjna` ASC")
+            if sql:
+                for i, element in enumerate(sql):
+                    sql[i] = list(element)
+                    element = sql[i]
+                    for ii, lesson_data in enumerate(element): # TODO Do not use SQL as variable here, make a new query !!!
+                        if (ii >= 2) and (ii <= 6):
+                            if lesson_data != ['']:
+                                continue
+                            lesson_data = str(lesson_data).replace("[", "").replace("]", "").replace("'", "").split(", ")
+                            classroom = MiscTools.find(self, lambda Classroom: Classroom.name == lesson_data[0], data.classrooms)
+                            teacher = MiscTools.find(self, lambda Teacher: Teacher.name == lesson_data[2], data.teachers)
+                            subject = MiscTools.find(self, lambda Subject: Subject.name == lesson_data[1], data.subjects)
+                            element[ii] = [classroom, teacher, subject]
+
+                    sql[i] = Timetable(
+                        assigned_class = MiscTools.find(self, lambda ClassTeam: ClassTeam.name == element[0], data.classes),
+                        lesson_hour = MiscTools.find(self, lambda LessonHour: LessonHour.lp == element[1], data.lesson_hours),
+                        monday = element[2],
+                        tuesday = element[3],
+                        wednesday = element[4],
+                        thursday = element[5],
+                        friday = element[6]
+                    )
+                data.timetables = sql
 
         return data
 
